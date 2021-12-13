@@ -303,14 +303,23 @@ def login_page2():
     student_code = request.form["student-code"]
     student = Student.query.filter(Student.code == student_code).first()
     if student:
-        flash("Študent bol nájdený", "success")
-        return redirect(url_for("student_bp.continue_login"))
+        flash("Pokračuj v registrácií", "success")
+        return render_template("student/continue_login.html", student=student)
 
     flash("Neplatný kód", "danger")
     return render_template("student/login_page.html", register_bool=True)
 
 
-@student_bp.route("/login/stage-2/", methods=["GET"])
-def continue_login():
-    return render_template("student/continue_login.html")
+@student_bp.route("/login/register/<int:code>/", methods=["POST"])
+def finish_registration(code):
+    student = Student.query.filter(Student.code == code).first()
+    if student:
+        student.email = request.form["student-email"]
+        student.set_password(request.form["student-password"])
+        student.authorized = True
+        db_session.commit()
+        print(request.form["students-tags"])
+
+    flash("Neplatný kód", "danger")
+    return render_template("student/login_page.html", register_bool=True)
 

@@ -24,7 +24,7 @@ def sign_in_page2():
     if user and user.check_password(request.form["password"]):
         try:
             check = request.form["remember_me"]
-            login_user(user,remember=True)
+            login_user(user, remember=True)
         except:
             login_user(user)
         flash("Vitajte späť","success")
