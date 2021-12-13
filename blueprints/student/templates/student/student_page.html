@@ -1,0 +1,302 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Študent {{ student.name }}
+{% endblock title %}
+
+
+{% block content %}
+    <script>
+		$(document).ready(function(){
+  		 	$(".active").removeClass("active");
+  		 	$("#student").addClass("active");
+		});
+	</script>
+
+
+    <style>
+
+        @media only screen and (max-width: 600px) {
+            .book-list {
+                margin-top:200px;
+                padding-top:15px;
+            }
+            .student-card {
+                margin:10px;
+            }
+            .utilities-buttons {
+                display:none;
+            }
+        }
+        {% if not current_user.is_authenticated %}
+            #main_place {
+                padding-bottom:50px;
+            }
+        {% endif %}
+    </style>
+
+
+
+
+    <div class="container" style="padding-top:100px;">
+        <div class="row">
+            <div class="card student-card col-md-4 col-lg-4 col-sm-12 col-xs-12" style="height:180px;">
+              <div class="card-body">
+
+                <div id="operation2" style="display:none">
+                    <h3 class="card-title">{{student.name}}</h3>
+                    <div>
+                        <strong>Trieda:</strong>
+                        <a href="{{ url_for('student_bp.landing_page_grade',grade=student.grade.name) }}" style="text-decoration:none;color:black;">{{ student.grade.name }}</a>
+                    </div>
+                    <div style="margin-top:2px;">
+                        <strong>Kód: </strong>
+                        <label>{{ student.code }}</label>
+                    </div>
+                    <button onclick="show('operation1')" style="margin-top:10px;" class="btn btn-sm btn-secondary ">Upraviť</button>
+                </div>
+                <div id="main_place">
+                    <h3 class="card-title">{{student.name}}</h3>
+                    <div>
+                        <strong>Trieda:</strong>
+                        <a href="{{ url_for('student_bp.landing_page_grade',grade=student.grade.name) }}" style="text-decoration:none;color:black;">{{ student.grade.name }}</a>
+                    </div>
+                    <div style="margin-top:2px;">
+                        <strong>Kód: </strong>
+                        <label>{{ student.code }}</label>
+                    </div>
+                    {% if current_user.is_authenticated %}
+                        <button onclick="show('operation1')" style="margin-top:10px;" class="btn btn-sm btn-secondary ">Upraviť</button>
+                    {% endif %}
+                </div>
+                {% if current_user.is_authenticated %}
+                <div id="operation1" style="display:none">
+                    <form method="post" class="needs-validation" action="{{ url_for('student_bp.change_student',student_id = student.id) }}">
+                      <h4 style="padding-bottom:10px;">Upraviť údaje:</h4>
+                      <div class="form-group row">
+                        <label for="studentName" style="margin-right:-30px;" class="col-sm-3 col-form-label">Meno</label>
+                        <div class="col-sm-9">
+                            <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="30" id="studentName" name="student_name" type="text" value="{{ student.name }}" class="form-control" placeholder="Meno" required>
+                        </div>
+                        <div style="margin-left:10px;" class="invalid-feedback">
+                          Zadajte platné meno študenta
+                        </div>
+                      </div>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                      <div class="form-group row">
+                        <label for="studentGrade" style="margin-right:-30px;" class="col-sm-3 col-form-label">Trieda</label>
+                        <div class="col-sm-9">
+                            <select id="studentGrade" class="form-control" name="student_grade">
+                              {% for grade in grades %}
+                                {% if grade == student.grade %}
+                                    <option selected>{{ grade.name }}</option>
+                                {% else %}
+                                    <option>{{ grade.name }}</option>
+                                {% endif %}
+                              {% endfor %}
+                            </select>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="studentCode" style="margin-right:-30px;" class="col-sm-3 col-form-label">Kód</label>
+                        <div class="col-sm-9">
+                            <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="15" id="studentCode" name="student_code" type="number" value="{{ student.code }}" class="form-control" placeholder="Kód" required>
+                        </div>
+                        <div style="margin-left:10px;" class="invalid-feedback">
+                          Zadajte platný kód študenta
+                        </div>
+                      </div>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                      <div style="padding-top:15px;">
+                          <button type="submit" class="btn btn-sm btn-success">Uložiť zmeny</button>
+                          <button onclick="show('operation2')" class="btn btn-sm btn-secondary ">Vrátiť</button>
+                      </div>
+                    </form>
+
+                </div>
+                {% endif %}
+
+
+              </div>
+              <div style="margin-top:10px;" class="d-flex justify-content-center add-book-m">
+	            	<div class="collapse " id="new-book">
+	            	  <div class="card card-body ">
+                        <strong class="" style="padding-bottom:5px;font-size: 18px;">Pridať učebnicu</strong>
+	            	    <form class="form-inline needs-validation" action="{{url_for('student_bp.rent_book',student_id=student.id)}}" method="post" style="margin-top:10px;" novalidate>
+	            		  <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="15" name="code"  type="number" class="form-control mb-2 mr-sm-2" placeholder="Kód" required>
+                          <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
+                            Zadaj platný kód učebnice
+                          </div>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                          <button type="submit" class="btn btn-success mb-2">Pridať</button>
+	            		</form>
+	            	  </div>
+	            	</div>
+	           </div>
+               <div class="card card-body d-block d-sm-none add-book-m" style="margin:-15px;margin-top:2px;">
+                        <strong class="" style="padding-bottom:5px;font-size: 18px;">Pridať učebnicu</strong>
+	            	    <form class="form-inline needs-validation" action="{{url_for('student_bp.rent_book',student_id=student.id)}}" method="post" style="margin-top:10px;" novalidate>
+	            		  <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="15" name="code"  type="number" class="form-control mb-2 mr-sm-2" id="validationCustom01" placeholder="Kód" required>
+                          <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
+                            Zadaj platný kód učebnice
+                          </div>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                          <button type="submit" class="btn btn-success mb-2">Pridať</button>
+	            		</form>
+	            	  </div>
+               <div style="margin-top:20px;" class="d-flex justify-content-center">
+                    <button id="add-book" class="btn btn-primary utilities-buttons" onclick="moveModal" type="button" data-toggle="collapse" data-target="#new-book" aria-expanded="false" aria-controls="new-book">
+	                   + Pridať učebnicu
+	                </button>
+                    {% if current_user.is_authenticated %}
+                        <button type="button" style="margin-left:5px;" class="btn btn-info utilities-buttons" data-toggle="modal" data-target="#exampleModal56">
+                          Vrátiť všetky
+                        </button>
+                    {% endif %}
+               </div>
+            </div>
+            <div id="book-list" style="" class="book-list col-md-8 col-lg-8 col-sm-12 col-xs-12">
+                <div  id="book-list2">
+                </div>
+                    <h4  class="text-muted">Požičané učebnice</h4>
+                <div>
+                    {% if student.books %}
+                        {% for book in student.books %}
+                            <div style="margin-top:10px;" class="card">
+                              <div class="card-body">
+
+                                <div class="container">
+                                    <div class="row">
+                                        <img class="inline img-grade" height="30" src="{{url_for('static',filename='images/book_icon.png')}}">
+                                        <div style="margin-left:10px;" class="col-8">
+                                            <h5>{{ book.book_type.name }}</h5>
+                                        </div>
+
+                                        <div style="margin-left:50px;" class="col-8">
+                                            <strong>Autor:</strong>
+                                            <label>{{ book.book_type.author }}</label>
+                                        </div>
+                                        {% if current_user.is_authenticated %}
+                                            <div>
+                                                <a class="btn btn-info float-right btn-sm" href="{{ url_for('student_bp.return_book',student_id=student.id,book_id=book.id) }}">Vrátiť</a>
+                                            </div>
+                                        {% endif %}
+                                        <div class="col-8" style="margin-left:50px;margin-top:-10px;margin-bottom:-5px;">
+                                            <strong>Kód:</strong>
+                                            <label>{{ book.code }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                              </div>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <label style="padding-left:20px;padding-top:10px;">Žiadne požičané učebnice</label>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if current_user.is_authenticated %}
+    <div class="modal fade" id="ar_u_s" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Naozaj chcete vymazať študenta ?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Ak vymažete študenta '{{ student.name }}', nie je možné to vrátiť späť.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Zrušiť</button>
+            <a href="{{ url_for('student_bp.delete_student',student_id=student.id) }}" type="button" class="btn btn-danger">Vymazať</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade " id="exampleModal56" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Vrátiť všetky učebnice ?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Naozaj chcete vrátiť do skladu všetky učebnice žiaka {{ student.name }} ? Po vrátení všetkých učebníc musíte žiakovi pridať učebnice manuálne.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Zrušiť</button>
+            <a type="button" href="{{ url_for('student_bp.return_all',student_id=student.id) }}" class="btn btn-info">Vrátiť</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+        <div class="d-flex justify-content-center" style="margin-top:130px;">
+            <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#ar_u_s">Vymazať študenta</button>
+        </div>
+    {% endif %}
+
+
+
+    <script>
+
+        // script to check input
+	    (function() {
+          'use strict';
+          window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+              form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+              }, false);
+            });
+          }, false);
+        })();
+
+        function show(param_div_id) {
+          if (param_div_id === 'operation1') {
+            if ($(window).width() > 600) {
+                $(".student-card").css("height","300px");
+            } else {
+                $(".student-card").css("height","410px");
+            }
+          } else {
+            $(".student-card").css("height","180px");
+          }
+          document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
+        }
+
+
+        $(document).ready(function(){
+	     $('#add-book').on('click', function () {
+	      var text=$('#add-book').text();
+	      if(text === "- Pridať učebnicu"){
+	        $(this).html('+ Pridať učebnicu');
+	      } else{
+	        $(this).text('- Pridať učebnicu');
+	     }
+	    });
+	    });
+
+    </script>
+
+
+{% endblock content %}

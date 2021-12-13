@@ -1,0 +1,205 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Zoznam všetkých učebníc
+{% endblock title %}
+
+
+{% block content %}
+    <script>
+		$(document).ready(function(){
+  		 	$(".active").removeClass("active");
+  		 	$("#book").addClass("active");
+		});
+	</script>
+
+    <style>
+        .grade-link {
+            color:black;
+        }
+        .grade-link:hover {
+            color:black;
+            text-decoration: none;
+        }
+        #live-search-box{
+           text-align:center;
+        }
+    </style>
+
+    <div class="container" style="margin-top:70px;">
+        <div class="row d-flex justify-content-center">
+            <h1>Všetky učebnice</h1>
+        </div>
+    </div>
+
+    <div class="container" style="margin-top:40px;">
+        <div class="row d-flex justify-content-center">
+            <form class="form-inline my-2 my-lg-0">
+              <input class="form-control mr-sm-2" id="live-search-box" type="search" placeholder="Vyhľadať učebnicu" aria-label="Search">
+            </form>
+        </div>
+    </div>
+
+    <div class="container" style="padding-top:20px;">
+        <div class="row d-flex justify-content-center">
+            <a href="{{ url_for('book_bp.books_state',book_state='free') }}" class="grade-link">
+                <div class="card center" style="margin:10px;">
+                  <div class="card-body">
+                    Voľné
+                  </div>
+                </div>
+            </a>
+            <a href="{{ url_for('book_bp.books_state',book_state='rent') }}" class="grade-link">
+                <div class="card center" style="margin:10px;">
+                  <div class="card-body">
+                    Požičané
+                  </div>
+                </div>
+            </a>
+            <a href="{{ url_for('book_bp.list_of_books') }}" class="grade-link">
+                <div class="card center" style="margin:10px;">
+                  <div class="card-body">
+                    Všetky
+                  </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="container" style="padding-top:60px;">
+        <table class="table" id="books-table">
+          <thead class="thead-dark">
+            <tr class="header">
+              <th scope="col">#</th>
+              <th scope="col">Typ</th>
+              <th scope="col">Kód</th>
+              <th scope="col">Študent</th>
+              <th scope="col">Vrátiť</th>
+              <th scope="col">Vymazať</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for book in books %}
+                {% if book.student %}
+                    <tr class="table-danger">
+                      <th scope="row">{{ book.id }}</th>
+                      <td class="search-term">{{ book.book_type.name }}</td>
+                      <td>{{  book.code }}</td>
+                      <td>{{ book.student.name }}</td>
+                      <td>
+                          <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#modalForReturn" data-bookcode="{{ book.code }}">Vrátiť</button>
+                      </td>
+                      <td>
+                          <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalForDelete" data-bookcode="{{ book.code }}">Odstrániť</button>
+                      </td>
+                    </tr>
+                {% else %}
+                    <tr class="table-success">
+                      <th scope="row">{{ book.id }}</th>
+                      <td class="search-term">{{ book.book_type.name }}</td>
+                      <td>{{  book.code }}</td>
+                      <td>-</td>
+                      <td>-</td>
+                      <td>
+                          <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalForDelete" data-bookcode="{{ book.code }}">Odstrániť</button>
+                      </td>
+                    </tr>
+                {% endif %}
+            {% endfor %}
+
+          </tbody>
+        </table>
+
+    <!-- MODAL FOR DELETE A BOOK -->
+    <div class="modal fade" id="modalForDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Odstránenie učebnice</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="main-text" style="padding-bottom:20px;">
+
+            </div>
+            <form method="post" action="{{ url_for('book_bp.delete_book_from_list') }}">
+              <div class="form-group change-input d-none">
+                <input type="number" name="book_code" class="form-control">
+              </div>
+               <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" class="btn btn-danger float-right">Odstrániť</button>
+              <button type="button" class="btn btn-secondary float-right" style="margin-right:5px;" data-dismiss="modal">Zrušiť</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- MODAL FOR RETURN A BOOK -->
+    <div class="modal fade" id="modalForReturn" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Vrátenie učebnice</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="main-text" style="padding-bottom:20px;">
+
+            </div>
+            <form method="post" action="{{ url_for('book_bp.return_book_from_list') }}">
+              <div class="form-group change-input d-none">
+                <input type="number" name="book_code" class="form-control">
+              </div>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" class="btn btn-info float-right">Vrátiť</button>
+              <button type="button" class="btn btn-secondary float-right" style="margin-right:5px;" data-dismiss="modal">Zrušiť</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    </div>
+
+    <script>
+
+        // script for sending data to "delete a book" modal
+        $('#modalForDelete').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget) // Button that triggered the modal
+          var recipient = button.data('bookcode') // Extract info from data-* attributes
+
+          var modal = $(this)
+          modal.find('.modal-body .main-text').text("Naozaj chcete odstrániť učebnicu s kódom " + recipient)
+          modal.find('.modal-body .change-input input').val(recipient)
+        })
+
+
+        // script for sending data to "return a book" modal
+        $('#modalForReturn').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget) // Button that triggered the modal
+          var recipient = button.data('bookcode') // Extract info from data-* attributes
+
+          var modal = $(this)
+          modal.find('.modal-body .main-text').text("Naozaj chcete vrátiť učebnicu s kódom " + recipient)
+          modal.find('.modal-body .change-input input').val(recipient)
+        })
+
+        $(document).ready(function(){
+          $("#live-search-box").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#books-table tr:not(.header)").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+        });
+
+
+    </script>
+
+{% endblock content %}

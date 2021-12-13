@@ -1,0 +1,96 @@
+
+.links-items {
+    padding-right:10px;
+    padding-left:10px;
+    font-size: 18px;
+}
+
+
+
+/* navbar menu */
+.own-logo {
+    height:100px;
+}
+
+#nav-bar-menu {
+    padding-top:20px;
+    padding-bottom:20px;
+}
+
+#sign-up-btn {
+    margin-right:15px;
+    margin-left:10px;
+}
+
+
+.content {
+  min-height: calc(100vh - 70px);
+}
+#footer-lop {
+  background-color:black;
+}
+
+.footer a {
+    color:white;
+}
+
+.footer a:hover {
+    color:white;
+    text-decoration:none;
+}
+
+/* Other Classes for Page Styling */
+.success{
+	display:flex;
+	height:20px;
+	background: #82f582;
+  	padding: 5px;
+  	padding-top:10px;
+  	padding-bottom:10px;
+  	padding-left:50px;
+  	margin-right:50px;
+  	margin-left:20px;
+  	margin-top:15px;
+  	margin-bottom:0px;
+  	border-collapse:separate;
+   	border:solid #82f582 1px;
+   	border-radius:6px;
+   	-moz-border-radius:6px;
+   	font-family:Calibri;
+}
+.danger{
+	display:flex;
+	height:20px;
+	background: #f1a181;
+  	padding: 5px;
+  	padding-top:10px;
+  	padding-bottom:10px;
+  	padding-left:50px;
+  	margin-right:60px;
+  	margin-left:20px;
+  	margin-top:15px;
+  	margin-bottom:0px;
+  	border-collapse:separate;
+   	border:solid #f1a181 1px;
+   	border-radius:6px;
+   	-moz-border-radius:6px;
+   	font-family:Calibri;
+}
+.success{
+	display:flex;
+	height:20px;
+	background: #b3ccff;
+  	padding: 5px;
+  	padding-top:10px;
+  	padding-bottom:10px;
+  	padding-left:50px;
+  	margin-right:50px;
+  	margin-left:20px;
+  	margin-top:15px;
+  	margin-bottom:0px;
+  	border-collapse:separate;
+   	border:solid #82f582 1px;
+   	border-radius:6px;
+   	-moz-border-radius:6px;
+   	font-family:Calibri;
+}

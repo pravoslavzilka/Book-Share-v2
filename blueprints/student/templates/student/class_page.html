@@ -1,0 +1,221 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Trieda {{ grade.name }}
+{% endblock title %}
+
+
+{% block content %}
+    <script>
+		$(document).ready(function(){
+  		 	$(".active").removeClass("active");
+  		 	$("#students").addClass("active");
+		});
+	</script>
+
+    <style>
+
+        .book-type-card {
+            height:140px;
+        }
+
+        @media only screen and (max-width: 700px) {
+            .book-list {
+                margin-top:180px;
+                padding-top:15px;
+            }
+            .book-type-card {
+                margin:10px;
+                margin-top:-50px;
+            }
+            .utilities-buttons {
+                display:none;
+            }
+
+            #live-search-box {
+                margin: auto;
+                width: 50%;
+                padding: 10px;
+                margin-top:35px;
+            }
+        }
+
+    </style>
+
+
+
+
+    <div class="container" style="padding-top:100px;">
+        <div class="row">
+            <div class="card book-type-card col-md-4 col-lg-4 col-sm-12 col-xs-12" >
+              <div class="card-body">
+                <div id="main_place">
+                    <h3 class="card-title" >{{ grade.name }}</h3>
+                    <div>
+                        <div style="padding-top:3px;">
+                            <strong>Dlžníci:</strong>
+                            <label>{{ stwbc }}</label>
+                        </div>
+                        <div style="margin-top:-8px;">
+                            <strong>Celkovo: </strong>
+                            <label>{{ students|length }}</label>
+                        </div>
+                    </div>
+                </div>
+              </div>
+              <div style="margin-top:10px;" class="d-flex justify-content-center">
+	            	<div class="collapse " id="new-book">
+	            	  <div class="card card-body ">
+                        <strong class="" style="padding-bottom:5px;font-size: 18px;">Nový Študent</strong>
+	            	    <form class="form-inline needs-validation" action="{{ url_for('student_bp.new_student') }}" method="post" style="margin-top:10px;" novalidate>
+	            		  <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="50" name="student-name" type="text" class="form-control mb-2 mr-sm-2" placeholder="Meno Študenta" required>
+                            <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
+                              Zadajte kód učebnice
+                            </div>
+                            <input type="hidden" name="student-grade" value="{{ grade.name }}"/>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                          <button type="submit" class="btn btn-success mb-2">Pridať</button>
+	            		</form>
+	            	  </div>
+	            	</div>
+	           </div>
+               <div class="card card-body d-block d-sm-none" style="margin:-15px;margin-top:-15px;">
+                        <strong class="" style="padding-bottom:5px;font-size: 18px;">Nový Študent</strong>
+	            	    <form class="form-inline needs-validation" action="{{ url_for('student_bp.new_student') }}" method="post" style="margin-top:10px;" novalidate>
+	            		  <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="50" name="student-name" type="text" class="form-control mb-2 mr-sm-2" placeholder="Meno Študenta" required>
+                            <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
+                              Zadajte kód učebnice
+                            </div>
+                            <input type="hidden" name="student-grade" value="{{ grade.name }}"/>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                          <button type="submit" class="btn btn-success mb-2">Pridať</button>
+	            		</form>
+	            	  </div>
+               <div style="margin-top:20px;" class="d-flex justify-content-center">
+                    <button id="add-book" class="btn btn-primary utilities-buttons" onclick="moveModal" type="button" data-toggle="collapse" data-target="#new-book" aria-expanded="false" aria-controls="new-book">
+	                   + Pridať študenta
+	                </button>
+
+               </div>
+            </div>
+            <div id="book-list" class="book-list col-md-8 col-lg-8 col-sm-12 col-xs-12">
+                <div  id="book-list2" style="margin-bottom:10px;">
+                    <input placeholder="Vyhľadať študenta" type="text" class="form-control" style="width:200px;" id="live-search-box">
+                </div>
+
+                <table class="table" id="students-table">
+                  <thead class="thead-dark">
+                    <tr class="header">
+                      <th scope="col">#</th>
+                      <th scope="col">Meno</th>
+                      <th scope="col">Kód</th>
+                      <th scope="col">Trieda</th>
+                      <th scope="col">Všetky knihy</th>
+                      <th scope="col">Vidieť</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for student in students %}
+                        <tr>
+                          <th scope="row">{{ student.id }}</th>
+                          <td>{{ student.name }}</td>
+                          <td>{{ student.code }}</td>
+                          <td>{{ grade.name }}</td>
+                          <td>{{ student.books|length }}</td>
+                          <td><a class="btn btn-primary btn-sm " href="{{url_for('student_bp.view_student',student_id=student.id)}}">Vidieť</a></td>
+                        </tr>
+                    {% endfor %}
+
+                  </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    </div>
+
+
+
+
+    <script>
+        // script for sending data to "delete a book" modal
+        $('#modalForDelete').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget) // Button that triggered the modal
+          var recipient = button.data('bookcode') // Extract info from data-* attributes
+
+          var modal = $(this)
+          modal.find('.modal-body .main-text').text("Naozaj chcete odstrániť učebnicu s kódom " + recipient)
+          modal.find('.modal-body .book-code-div input').val(recipient)
+        })
+
+
+        // script for sending data to "return a book" modal
+        $('#modalForReturn').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget) // Button that triggered the modal
+          var recipient = button.data('bookcode') // Extract info from data-* attributes
+
+          var modal = $(this)
+          modal.find('.modal-body .main-text').text("Naozaj chcete vrátiť učebnicu s kódom " + recipient)
+          modal.find('.modal-body .book-code-div input').val(recipient)
+        })
+
+
+        // script for jQuery search in table
+        $(document).ready(function(){
+          $("#live-search-box").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#students-table tr:not(.header)").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+        });
+
+        function show(param_div_id) {
+          if (param_div_id === 'operation1') {
+            if ($(window).width() > 600) {
+                $(".book-type-card").css("height","245px");
+            } else {
+                $(".book-type-card").css("height","320px");
+            }
+          } else {
+            if ($(window).width() > 600) {
+                $(".book-type-card").css("height","225px");
+            } else {
+                $(".book-type-card").css("height","260px");
+            }
+          }
+          document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
+        }
+
+        $(document).ready(function(){
+	     $('#add-book').on('click', function () {
+	      var text=$('#add-book').text();
+	      if(text === "- Pridať študenta"){
+	        $(this).html('+ Pridať študenta');
+	      } else{
+	        $(this).text('- Pridať študenta');
+	     }
+	    });
+	    });
+
+	    // script to check input
+	    (function() {
+          'use strict';
+          window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+              form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+              }, false);
+            });
+          }, false);
+        })();
+
+    </script>
+
+{% endblock content %}

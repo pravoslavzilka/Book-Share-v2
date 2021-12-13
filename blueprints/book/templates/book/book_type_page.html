@@ -1,0 +1,377 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Učebnice {{ book_type.name }}
+{% endblock title %}
+
+
+{% block content %}
+    <script>
+		$(document).ready(function(){
+  		 	$(".active").removeClass("active");
+  		 	$("#book").addClass("active");
+		});
+	</script>
+
+    <style>
+
+        .book-type-card {
+            height:225px;
+        }
+
+        @media only screen and (max-width: 700px) {
+            .book-list {
+                margin-top:200px;
+                padding-top:15px;
+            }
+            .book-type-card {
+                margin:10px;
+                height:260px;
+            }
+            .utilities-buttons {
+                display:none;
+            }
+
+            #search-bar {
+                margin: auto;
+                width: 50%;
+                padding: 10px;
+                margin-top:35px;
+            }
+        }
+
+    </style>
+
+
+
+
+    <div class="container" style="padding-top:100px;">
+        <div class="row">
+            <div class="card book-type-card col-md-4 col-lg-4 col-sm-12 col-xs-12" >
+              <div class="card-body">
+                <div id="operation2" style="display:none">
+                    <h3 class="card-title" >{{ book_type.name }}</h3>
+                    <div>
+                        <div>
+                            <h6 class="text-muted" style="margin-top:-7px;">{{ book_type.author }}</h6>
+                        </div>
+                        <div style="padding-top:3px;">
+                            <strong>Požičané:</strong>
+                            <label>{{ crbooks }}</label>
+                        </div>
+                        <div style="margin-top:-8px;">
+                            <strong>Na sklade: </strong>
+                            <label>{{ cfbooks }}</label>
+                        </div>
+                        <div style="margin-top:-8px;">
+                            <strong>Celkovo: </strong>
+                            <label>{{ ctbooks }}</label>
+                        </div>
+                    </div>
+                    <button onclick="show('operation1')" style="margin-top:5px;" class="btn btn-sm btn-secondary ">Upraviť</button>
+                </div>
+                <div id="main_place">
+                    <h3 class="card-title" >{{ book_type.name }}</h3>
+                    <div>
+                        <div>
+                            <h6 class="text-muted" style="margin-top:-7px;">{{ book_type.author }}</h6>
+                        </div>
+                        <div style="padding-top:3px;">
+                            <strong>Požičané:</strong>
+                            <label>{{ crbooks }}</label>
+                        </div>
+                        <div style="margin-top:-8px;">
+                            <strong>Na sklade: </strong>
+                            <label>{{ cfbooks }}</label>
+                        </div>
+                        <div style="margin-top:-8px;">
+                            <strong>Celkovo: </strong>
+                            <label>{{ ctbooks }}</label>
+                        </div>
+                    </div>
+                    <button onclick="show('operation1')" style="margin-top:5px;" class="btn btn-sm btn-secondary ">Upraviť</button>
+                </div>
+                {% if current_user.is_authenticated %}
+                    <div id="operation1" style="display:none">
+                        <form method="post" class="needs-validation" action="{{ url_for('book_bp.update_book_type',type_id=book_type.id) }}">
+                          <h4 style="padding-bottom:10px;">Upraviť údaje:</h4>
+                          <div class="form-group row">
+                            <label for="studentName" style="margin-right:-30px;" class="col-sm-3 col-form-label">Názov</label>
+                            <div class="col-sm-9">
+                                <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="50" id="studentName" name="book_type_name" type="text" value="{{ book_type.name }}" class="form-control" placeholder="Názov" required>
+                                <div style="margin-left:10px;" class="invalid-feedback">
+                                  Zadajte platný názov učebnice
+                                </div>
+                            </div>
+
+                          </div>
+                          <div class="form-group row">
+                            <label for="bookAuthor" style="margin-right:-30px;" class="col-sm-3 col-form-label">Autor</label>
+                            <div class="col-sm-9">
+                                <input id="bookAuthor" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="50" name="book_type_author" type="text" value="{{ book_type.author }}" class="form-control" placeholder="Autor" required>
+                                <div class="invalid-feedback">
+                                  Zadajte platného autora učebnice
+                                </div>
+                            </div>
+                          </div>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                          <div style="padding-top:15px;">
+                              <button type="submit" class="btn btn-sm btn-success">Uložiť zmeny</button>
+                              <button onclick="show('operation2')" class="btn btn-sm btn-secondary ">Vrátiť</button>
+                          </div>
+                        </form>
+
+                    </div>
+                {% endif %}
+              </div>
+              <div style="margin-top:35px;" class="d-flex justify-content-center">
+	            	<div class="collapse " id="new-book">
+	            	  <div class="card card-body ">
+                        <strong class="" style="padding-bottom:5px;font-size: 18px;">Nová učebnica</strong>
+	            	    <form class="form-inline needs-validation" action="{{ url_for('book_bp.add_book_with_type',bt_name=book_type.name) }}" method="post" style="margin-top:10px;" novalidate>
+	            		  <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="15" name="book_code" type="number" class="form-control mb-2 mr-sm-2" placeholder="Kód" required>
+                            <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
+                              Zadajte kód učebnice
+                            </div>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                          <button type="submit" class="btn btn-success mb-2">Pridať</button>
+	            		</form>
+	            	  </div>
+	            	</div>
+	           </div>
+               <div class="card card-body d-block d-sm-none" style="margin:-15px;margin-top:5px;">
+                        <strong class="" style="padding-bottom:5px;font-size: 18px;">Nová učebnica</strong>
+	            	    <form class="form-inline needs-validation" method="post" action="{{ url_for('book_bp.add_book_with_type',bt_name=book_type.name) }}"  style="margin-top:10px;" novalidate>
+	            		  <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="15" name="book_code" type="number" class="form-control mb-2 mr-sm-2"  placeholder="Kód" required>
+                          <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
+                              Zadajte kód učebnice
+                          </div>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                          <button type="submit" class="btn btn-success mb-2">Pridať</button>
+	            		</form>
+	            	  </div>
+               <div style="margin-top:20px;" class="d-flex justify-content-center">
+                    <button id="add-book" class="btn btn-primary utilities-buttons" onclick="moveModal" type="button" data-toggle="collapse" data-target="#new-book" aria-expanded="false" aria-controls="new-book">
+	                   + Pridať učebnicu
+	                </button>
+
+               </div>
+            </div>
+            <div id="book-list" class="book-list col-md-8 col-lg-8 col-sm-12 col-xs-12">
+                <div  id="book-list2">
+                    <input placeholder="Vyhľadať učebnicu" type="text" class="form-control" style="width:200px;" id="search-bar">
+                </div>
+
+                <table class="table" style="margin-top:20px;">
+                  <thead class="thead-dark">
+                    <tr class="header">
+                      <th scope="col">#</th>
+                      <th scope="col">Kód</th>
+                      <th scope="col">Študent</th>
+                      <th scope="col">Vrátiť</th>
+                      <th scope="col">Odstrániť</th>
+                    </tr>
+                  </thead>
+                  <tbody id="listStudents">
+                    {% for book in book_type.books %}
+                        {% if book.student %}
+                            <tr class="table-danger">
+                              <th scope="row">{{ book.id }}</th>
+                              <td>{{ book.code }}</td>
+                              <td>
+                                  <a href="{{ url_for('student_bp.view_student',student_id=book.student.id) }}" style="text-decoration:none;color:black;">
+                                      {{ book.student.name }}
+                                  </a>
+                                </td>
+                              <td>
+                                  <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#modalForReturn" data-bookcode="{{ book.code }}">Vrátiť</button>
+                              </td>
+                              <td>
+                                  <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalForDelete" data-bookcode="{{ book.code }}">Odstrániť</button>
+                              </td>
+                            </tr>
+                        {% else %}
+                            <tr class="table-success">
+                              <th scope="row">{{ book.id }}</th>
+                              <td>{{ book.code }}</td>
+                              <td>-</td>
+                              <td>-</td>
+                              <td>
+                                  <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalForDelete" data-bookcode="{{ book.code }}">Odstrániť</button>
+                              </td>
+                            </tr>
+                        {% endif %}
+
+                    {% endfor %}
+
+                  </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="ar_u_s" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Naozaj chcete vymazať tento typ učebnice ?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Ak vymažete typ učebnice '{{ book_type.name }}', všetky učebnice tohto typu budú vymazané.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Zrušiť</button>
+            <a href="{{ url_for('book_bp.delete_type',type_id=book_type.id) }}" type="button" class="btn btn-danger">Vymazať</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center" style="margin-top:130px;">
+        <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#ar_u_s">Vymazať typ učebnice</button>
+    </div>
+
+    <!-- MODAL FOR DELETE A BOOK -->
+    <div class="modal fade" id="modalForDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Odstránenie učebnice</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="main-text" style="padding-bottom:20px;">
+
+            </div>
+            <form method="post" action="{{ url_for('book_bp.delete_book') }}">
+              <div class="form-group book-code-div d-none">
+                <input id="book_code" type="number" name="book_code" class="form-control">
+              </div>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" class="btn btn-danger float-right">Odstrániť</button>
+              <button type="button" class="btn btn-secondary float-right" style="margin-right:5px;" data-dismiss="modal">Zrušiť</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- MODAL FOR RETURN A BOOK -->
+    <div class="modal fade" id="modalForReturn" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Vrátenie učebnice</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="main-text" style="padding-bottom:20px;">
+
+            </div>
+            <form method="post" action="{{ url_for('book_bp.return_book_with_type') }}">
+              <div class="form-group book-code-div d-none">
+                <input type="number" name="book_code" class="form-control">
+              </div>
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              <button type="submit" class="btn btn-info float-right">Vrátiť</button>
+              <button type="button" class="btn btn-secondary float-right" style="margin-right:5px;" data-dismiss="modal">Zrušiť</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+    <script>
+        // script for sending data to "delete a book" modal
+        $('#modalForDelete').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget) // Button that triggered the modal
+          var recipient = button.data('bookcode') // Extract info from data-* attributes
+
+          var modal = $(this)
+          modal.find('.modal-body .main-text').text("Naozaj chcete odstrániť učebnicu s kódom " + recipient)
+          modal.find('.modal-body .book-code-div input').val(recipient)
+        })
+
+
+        // script for sending data to "return a book" modal
+        $('#modalForReturn').on('show.bs.modal', function (event) {
+          var button = $(event.relatedTarget) // Button that triggered the modal
+          var recipient = button.data('bookcode') // Extract info from data-* attributes
+
+          var modal = $(this)
+          modal.find('.modal-body .main-text').text("Naozaj chcete vrátiť učebnicu s kódom " + recipient)
+          modal.find('.modal-body .book-code-div input').val(recipient)
+        })
+
+
+        // script for jQuery search in table
+        $(document).ready(function(){
+          $("#search-bar").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#listStudents tr").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+        });
+
+        function show(param_div_id) {
+          if (param_div_id === 'operation1') {
+            if ($(window).width() > 600) {
+                $(".book-type-card").css("height","245px");
+            } else {
+                $(".book-type-card").css("height","320px");
+            }
+          } else {
+            if ($(window).width() > 600) {
+                $(".book-type-card").css("height","225px");
+            } else {
+                $(".book-type-card").css("height","260px");
+            }
+          }
+          document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
+        }
+
+        $(document).ready(function(){
+	     $('#add-book').on('click', function () {
+	      var text=$('#add-book').text();
+	      if(text === "- Pridať učebnicu"){
+	        $(this).html('+ Pridať učebnicu');
+	      } else{
+	        $(this).text('- Pridať učebnicu');
+	     }
+	    });
+	    });
+
+	    // script to check input
+	    (function() {
+          'use strict';
+          window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+              form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+              }, false);
+            });
+          }, false);
+        })();
+
+    </script>
+
+{% endblock content %}

@@ -1,0 +1,272 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Prihlásenie
+{% endblock title %}
+
+
+{% block content %}
+
+    <script>
+		$(document).ready(function(){
+  		 	$(".active").removeClass("active");
+  		 	$("#sign_in").addClass("active");
+		});
+	</script>
+
+    <style>
+        :root {
+          --input-padding-x: 1.5rem;
+          --input-padding-y: .75rem;
+        }
+
+        .card-signin {
+          border: 0;
+          border-radius: 1rem;
+          box-shadow: 0 0.5rem 1rem 0 rgba(0, 0, 0, 0.1);
+        }
+
+        .card-signin .card-title {
+          margin-bottom: 2rem;
+          font-weight: 300;
+          font-size: 1.5rem;
+        }
+
+        .card-signin .card-body {
+          padding: 2rem;
+        }
+
+        .form-signin {
+          width: 100%;
+        }
+
+        .form-signin .btn {
+          font-size: 80%;
+          border-radius: 5rem;
+          letter-spacing: .1rem;
+          font-weight: bold;
+          padding: 1rem;
+          transition: all 0.2s;
+        }
+
+        .form-label-group {
+          position: relative;
+          margin-bottom: 1rem;
+        }
+
+        .form-label-group input {
+          height: auto;
+          border-radius: 2rem;
+        }
+
+        .form-label-group>input,
+        .form-label-group>label {
+          padding: var(--input-padding-y) var(--input-padding-x);
+        }
+
+        .form-label-group>label {
+          position: absolute;
+          top: 0;
+          left: 0;
+          display: block;
+          width: 100%;
+          margin-bottom: 0;
+          /* Override default `<label>` margin */
+          line-height: 1.5;
+          color: #495057;
+          border: 1px solid transparent;
+          border-radius: .25rem;
+          transition: all .1s ease-in-out;
+        }
+
+        .form-label-group input::-webkit-input-placeholder {
+          color: transparent;
+        }
+
+        .form-label-group input:-ms-input-placeholder {
+          color: transparent;
+        }
+
+        .form-label-group input::-ms-input-placeholder {
+          color: transparent;
+        }
+
+        .form-label-group input::-moz-placeholder {
+          color: transparent;
+        }
+
+        .form-label-group input::placeholder {
+          color: transparent;
+        }
+
+        .form-label-group input:not(:placeholder-shown) {
+          padding-top: calc(var(--input-padding-y) + var(--input-padding-y) * (2 / 3));
+          padding-bottom: calc(var(--input-padding-y) / 3);
+        }
+
+        .form-label-group input:not(:placeholder-shown)~label {
+          padding-top: calc(var(--input-padding-y) / 3);
+          padding-bottom: calc(var(--input-padding-y) / 3);
+          font-size: 12px;
+          color: #777;
+        }
+
+        .btn-google {
+          color: white;
+          background-color: #ea4335;
+        }
+
+        .btn-facebook {
+          color: white;
+          background-color: #3b5998;
+        }
+
+        /* Fallback for Edge
+        -------------------------------------------------- */
+
+        @supports (-ms-ime-align: auto) {
+          .form-label-group>label {
+            display: none;
+          }
+          .form-label-group input::-ms-input-placeholder {
+            color: #777;
+          }
+        }
+
+        /* Fallback for IE
+        -------------------------------------------------- */
+
+        @media all and (-ms-high-contrast: none),
+        (-ms-high-contrast: active) {
+          .form-label-group>label {
+            display: none;
+          }
+          .form-label-group input:-ms-input-placeholder {
+            color: #777;
+          }
+        }
+        .btr {
+    border-top-right-radius: 5px !important
+}
+
+
+    .loader {
+      border: 16px solid #f3f3f3; /* Light grey */
+      border-top: 16px solid #3498db; /* Blue */
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+
+    </style>
+
+    <div style="padding-top:70px;" class="container">
+      <div class="row">
+        <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+          <div class="card card-signin my-5">
+            <div class="card-body">
+              <div id="main-place"></div>
+              <div id="operation1" style="display:none">
+                  <h5 class="card-title text-center">Prihlásenie</h5>
+                  <form class="form-signin needs-validation" method="post" action="{{url_for('admin_bp.sign_in_page2')}}" novalidate>
+                    <div class="form-label-group">
+                      <input type="email" id="inputEmail" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="25" name="email" class="form-control" placeholder="Email address" required autofocus>
+                      <div style="margin-left:10px;" class="invalid-feedback">
+                        Zadajte platný email
+                      </div>
+                      <label for="inputEmail">Email</label>
+                    </div>
+
+                    <div class="form-label-group">
+                      <input type="password" id="inputPassword" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="25" name="password" class="form-control" placeholder="Password" required>
+                      <div style="margin-left:10px;" class="invalid-feedback">
+                        Zadajte platné heslo
+                      </div>
+                      <label for="inputPassword">Heslo</label>
+                    </div>
+
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit">Prihlásiť sa</button>
+                    <hr class="my-4">
+                    </form>
+                    <div class="text-center">
+                       <a onclick="innerHtml('operation2')" style="text-decoration: none;" href="#">Registrovať sa</a>
+                    </div>
+              </div>
+              <div id="operation2" style="display:none">
+                  <h5 class="card-title text-center">Zadaj svoj kód:</h5>
+                  <form class="form-signin needs-validation" method="post" action="{{url_for('student_bp.login_page2')}}" novalidate>
+                    <div class="form-label-group">
+                      <input type="number" id="studentId" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="15" name="student-code" class="form-control" placeholder="Kód" required autofocus>
+                      <div style="margin-left:10px;" class="invalid-feedback">
+                        Zadaj platný kód študenta
+                      </div>
+                      <label for="studentId">Kód</label>
+                    </div>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button class="btn btn-lg btn-primary btn-block text-uppercase" type="submit" onclick="submitForm()">Ďalej</button>
+                    <hr class="my-4">
+                    </form>
+                    <div class="text-center">
+                       <a onclick="innerHtml('operation1')" style="text-decoration: none;" href="#">Prihlásiť sa</a>
+                    </div>
+              </div>
+              <div style="display:none;" id="operation3">
+                  <div class="d-flex justify-content-center">
+                    <div style="margin-top:50px; margin-bottom:50px;" class="loader d-flex justify-content-center"></div>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+    <script>
+        // script to check input
+	    (function() {
+          'use strict';
+          window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+              form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+              }, false);
+            });
+          }, false);
+        })();
+
+        {% if register_bool %}
+            document.getElementById('main-place').innerHTML = document.getElementById('operation2').innerHTML;
+
+        {% else %}
+            document.getElementById('main-place').innerHTML = document.getElementById('operation1').innerHTML;
+        {% endif %}
+
+        function innerHtml(param_div_id) {
+            document.getElementById('main-place').innerHTML = document.getElementById(param_div_id).innerHTML;
+        }
+
+        function submitForm() {
+            setTimeout(function() {
+                document.getElementById('main-place').innerHTML = document.getElementById('operation3').innerHTML;
+              },10);
+        }
+    </script>
+
+{% endblock content %}
