@@ -36,6 +36,20 @@ db_session.add(g14)
 db_session.add(g15)
 db_session.add(g16)
 
+admin = User("admin","admin@localhost")
+admin.set_password("lumi")
+
+l = Student("Lumi", g6, 78495123660)
+db_session.add(admin)
+db_session.add(l)
+
+tag = Tag("Folklór")
+tag.students.append(l)
+db_session.add(tag)
+
+e = Event("Hudobný týždeň", "desc", l)
+db_session.add(e)
+
 db_session.commit()
 
 

@@ -1,7 +1,13 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Boolean
+from sqlalchemy import Column, Integer, String, ForeignKey, Boolean, Table, Date
 from sqlalchemy.orm import relationship
 from werkzeug.security import generate_password_hash, check_password_hash
 from database import Base
+
+
+association_table = Table('association', Base.metadata,
+    Column('student_id', ForeignKey('student.id'), primary_key=True),
+    Column('tag_id', ForeignKey('tag.id'), primary_key=True),
+)
 
 
 class User(Base):
@@ -45,10 +51,14 @@ class Student(Base):
     password = Column(String(128))
     authorized = Column(Boolean)
     code = Column(Integer, unique=True)
+    bio = Column(String(250))
     grade_id = Column(Integer, ForeignKey('grade.id'))
 
     grade = relationship("Grade", back_populates="students", foreign_keys=[grade_id])
     books = relationship("Book", back_populates="student", foreign_keys="[Book.student_id]")
+    events = relationship("Event", back_populates="student", foreign_keys="[Event.student_id]")
+
+    tags = relationship("Tag", secondary=association_table, back_populates="students")
 
     def __init__(self, name=None, grade=None, code=None):
         self.name = name
@@ -89,6 +99,34 @@ class Grade(Base):
         self.name = name
 
 
+class Tag(Base):
+    __tablename__ = "tag"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50), unique=True)
+
+    students = relationship("Student", secondary=association_table, back_populates="tags")
+
+    def __init__(self, name):
+        self.name = name
+
+
+class Event(Base):
+    __tablename__ = "event"
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    name = Column(String(50))
+    description = Column(String(300))
+    time = Column(Date)
+    teacher = Column(String(120))
+    student_id = Column(Integer, ForeignKey('student.id'))
+
+    student = relationship("Student", back_populates="events")
+
+    def __init__(self, name=None, description=None, leader=None):
+        self.name = name
+        self.description = description
+        self.student = leader
+
+
 class Book(Base):
     __tablename__ = "book"
     id = Column(Integer,primary_key=True)
@@ -96,8 +134,9 @@ class Book(Base):
     student_id = Column(Integer, ForeignKey('student.id'))
     book_type_id = Column(Integer, ForeignKey('book_type.id'))
 
-    student = relationship("Student", back_populates="books",foreign_keys=[student_id])
-    book_type = relationship("BookType", back_populates="books",foreign_keys=[book_type_id])
+    student = relationship("Student", back_populates="books", foreign_keys=[student_id])
+    book_type = relationship("BookType", back_populates="books", foreign_keys=[book_type_id])
+
 
     def __init__(self,code=None,book_type=None):
         self.code = code
