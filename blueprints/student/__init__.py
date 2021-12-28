@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from database import db_session
-from models import Grade, Student, Book
+from models import Grade, Student, Book, Tag
 from werkzeug.utils import secure_filename
 from flask_login import login_required,current_user
 import openpyxl
@@ -303,8 +303,12 @@ def login_page2():
     student_code = request.form["student-code"]
     student = Student.query.filter(Student.code == student_code).first()
     if student:
-        flash("Pokračuj v registrácií", "success")
-        return render_template("student/continue_login.html", student=student)
+        if not student.authorized:
+            flash("Pokračuj v registrácií", "success")
+            return render_template("student/continue_login.html", student=student)
+
+        flash("Už máš vytvorený profil, prihlás sa doň", "success")
+        return render_template("student/login_page.html")
 
     flash("Neplatný kód", "danger")
     return render_template("student/login_page.html", register_bool=True)
@@ -317,8 +321,20 @@ def finish_registration(code):
         student.email = request.form["student-email"]
         student.set_password(request.form["student-password"])
         student.authorized = True
+        student.bio = request.form["student-bio"]
+        tags = list(request.form["student-tags"].split(","))
+        for tag in tags:
+            s_tag = Tag.query.filter(Tag.name == tag).first()
+            if s_tag:
+                student.tags.append(s_tag)
+            else:
+                n_tag = Tag(tag)
+                db_session.add(n_tag)
+                student.tags.append(n_tag)
+
         db_session.commit()
-        print(request.form["students-tags"])
+        flash("Profil vytvorený", "success")
+        return render_template("student/login_page.html", register_bool=True)
 
     flash("Neplatný kód", "danger")
     return render_template("student/login_page.html", register_bool=True)
