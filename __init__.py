@@ -5,7 +5,7 @@ from blueprints.book.__init__ import book_bp
 from database import db_session
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
-from models import User
+from models import User, Student
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 import os
@@ -67,7 +67,7 @@ def shutdown_session(exception=None):
 
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.filter(User.id == user_id).first()
+    return Student.query.filter(Student.id == user_id).first() or User.query.filter(User.id == user_id).first()
 
 
 if __name__ == "__main__":

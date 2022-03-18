@@ -33,18 +33,6 @@
                 padding-bottom:50px;
             }
         {% endif %}
-
-        .tag {
-            display: inline-block;
-            background-color: #0275d8;
-            color: white;
-            border-radius: 40px;
-            padding: 0px 7px 0px 7px;
-            margin-right: 5px;
-            margin-bottom:5px;
-            box-shadow: 0 5px 15px -2px rgba(250 , 14 , 126 , .7)
-        }
-
     </style>
 
 
@@ -52,29 +40,85 @@
 
     <div class="container" style="padding-top:100px;">
         <div class="row">
-            <div class="card student-card col-md-4 col-lg-4 col-sm-12 col-xs-12" style="height:190px;">
+            <div class="card student-card col-md-4 col-lg-4 col-sm-12 col-xs-12" style="height:180px;">
               <div class="card-body">
-                <div id="main_place">
+
+                <div id="operation2" style="display:none">
                     <h3 class="card-title">{{student.name}}</h3>
                     <div>
                         <strong>Trieda:</strong>
-                        {{ student.grade.name }}
+                        <a href="{{ url_for('student_bp.landing_page_grade',grade=student.grade.name) }}" style="text-decoration:none;color:black;">{{ student.grade.name }}</a>
                     </div>
                     <div style="margin-top:2px;">
                         <strong>Kód: </strong>
                         <label>{{ student.code }}</label>
                     </div>
-                    <div style="margin-top:2px;">
-                        <strong style="margin-right:5px;" >Tagy: </strong>
-                        {% for tag in student.tags %}
-                            <label class="tag">{{ tag.name }}</label>
-                        {% endfor %}
+                    <button onclick="show('operation1')" style="margin-top:10px;" class="btn btn-sm btn-secondary ">Upraviť</button>
+                </div>
+                <div id="main_place">
+                    <h3 class="card-title">{{student.name}}</h3>
+                    <div>
+                        <strong>Trieda:</strong>
+                        <a href="{{ url_for('student_bp.landing_page_grade',grade=student.grade.name) }}" style="text-decoration:none;color:black;">{{ student.grade.name }}</a>
                     </div>
+                    <div style="margin-top:2px;">
+                        <strong>Kód: </strong>
+                        <label>{{ student.code }}</label>
+                    </div>
+                    {% if current_user.is_authenticated %}
+                        <button onclick="show('operation1')" style="margin-top:10px;" class="btn btn-sm btn-secondary ">Upraviť</button>
+                    {% endif %}
+                </div>
+                {% if current_user.is_authenticated %}
+                <div id="operation1" style="display:none">
+                    <form method="post" class="needs-validation" action="{{ url_for('student_bp.change_student',student_id = student.id) }}">
+                      <h4 style="padding-bottom:10px;">Upraviť údaje:</h4>
+                      <div class="form-group row">
+                        <label for="studentName" style="margin-right:-30px;" class="col-sm-3 col-form-label">Meno</label>
+                        <div class="col-sm-9">
+                            <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="30" id="studentName" name="student_name" type="text" value="{{ student.name }}" class="form-control" placeholder="Meno" required>
+                        </div>
+                        <div style="margin-left:10px;" class="invalid-feedback">
+                          Zadajte platné meno študenta
+                        </div>
+                      </div>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                      <div class="form-group row">
+                        <label for="studentGrade" style="margin-right:-30px;" class="col-sm-3 col-form-label">Trieda</label>
+                        <div class="col-sm-9">
+                            <select id="studentGrade" class="form-control" name="student_grade">
+                              {% for grade in grades %}
+                                {% if grade == student.grade %}
+                                    <option selected>{{ grade.name }}</option>
+                                {% else %}
+                                    <option>{{ grade.name }}</option>
+                                {% endif %}
+                              {% endfor %}
+                            </select>
+                        </div>
+                      </div>
+                      <div class="form-group row">
+                        <label for="studentCode" style="margin-right:-30px;" class="col-sm-3 col-form-label">Kód</label>
+                        <div class="col-sm-9">
+                            <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="15" id="studentCode" name="student_code" type="number" value="{{ student.code }}" class="form-control" placeholder="Kód" required>
+                        </div>
+                        <div style="margin-left:10px;" class="invalid-feedback">
+                          Zadajte platný kód študenta
+                        </div>
+                      </div>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                      <div style="padding-top:15px;">
+                          <button type="submit" class="btn btn-sm btn-success">Uložiť zmeny</button>
+                          <button onclick="show('operation2')" class="btn btn-sm btn-secondary ">Vrátiť</button>
+                      </div>
+                    </form>
 
                 </div>
+                {% endif %}
+
 
               </div>
-              <div style="margin-top:20px;" class="d-flex justify-content-center add-book-m">
+              <div style="margin-top:10px;" class="d-flex justify-content-center add-book-m">
 	            	<div class="collapse " id="new-book">
 	            	  <div class="card card-body ">
                         <strong class="" style="padding-bottom:5px;font-size: 18px;">Pridať učebnicu</strong>
@@ -106,6 +150,11 @@
                     <button id="add-book" class="btn btn-primary utilities-buttons" onclick="moveModal" type="button" data-toggle="collapse" data-target="#new-book" aria-expanded="false" aria-controls="new-book">
 	                   + Pridať učebnicu
 	                </button>
+                    {% if current_user.is_authenticated %}
+                        <button type="button" style="margin-left:5px;" class="btn btn-info utilities-buttons" data-toggle="modal" data-target="#exampleModal56">
+                          Vrátiť všetky
+                        </button>
+                    {% endif %}
                </div>
             </div>
             <div id="book-list" style="" class="book-list col-md-8 col-lg-8 col-sm-12 col-xs-12">
@@ -129,6 +178,11 @@
                                             <strong>Autor:</strong>
                                             <label>{{ book.book_type.author }}</label>
                                         </div>
+                                        {% if current_user.is_authenticated %}
+                                            <div>
+                                                <a class="btn btn-info float-right btn-sm" href="{{ url_for('student_bp.return_book',student_id=student.id,book_id=book.id) }}">Vrátiť</a>
+                                            </div>
+                                        {% endif %}
                                         <div class="col-8" style="margin-left:50px;margin-top:-10px;margin-bottom:-5px;">
                                             <strong>Kód:</strong>
                                             <label>{{ book.code }}</label>
@@ -145,6 +199,54 @@
             </div>
         </div>
     </div>
+
+    {% if current_user.is_authenticated %}
+    <div class="modal fade" id="ar_u_s" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Naozaj chcete vymazať študenta ?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Ak vymažete študenta '{{ student.name }}', nie je možné to vrátiť späť.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Zrušiť</button>
+            <a href="{{ url_for('student_bp.delete_student',student_id=student.id) }}" type="button" class="btn btn-danger">Vymazať</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade " id="exampleModal56" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Vrátiť všetky učebnice ?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            Naozaj chcete vrátiť do skladu všetky učebnice žiaka {{ student.name }} ? Po vrátení všetkých učebníc musíte žiakovi pridať učebnice manuálne.
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Zrušiť</button>
+            <a type="button" href="{{ url_for('student_bp.return_all',student_id=student.id) }}" class="btn btn-info">Vrátiť</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+        <div class="d-flex justify-content-center" style="margin-top:130px;">
+            <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#ar_u_s">Vymazať študenta</button>
+        </div>
+    {% endif %}
 
 
 
