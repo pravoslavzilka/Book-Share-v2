@@ -61,9 +61,13 @@
             <a class="nav-link" id="return-book" href="{{ url_for('book_bp.return_book_view') }}">Vrátiť knihu</a>
           </li>
 		{% else %}
-		  <!--<li class="links-items nav-item">
-            <a class="nav-link" id="find-student" href="{{ url_for('student_bp.search_student') }}">Vyhľadať študenta</a>
-          </li>-->
+		  <li class="links-items nav-item active">
+            <a class="nav-link" id="community" href="#">Komunita</a>
+          </li>
+		  <li class="links-items nav-item active">
+            <a class="nav-link" id="account" href="{{url_for('student_bp.student_account')}}">Tvoj profil</a>
+          </li>
+
 		{% endif %}
         </ul>
         {% if current_user.is_authenticated %}
