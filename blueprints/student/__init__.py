@@ -2,7 +2,7 @@ from flask import Blueprint, render_template, redirect, url_for, request, flash,
 from database import db_session
 from models import Grade, Student, Book, Tag, User
 from werkzeug.utils import secure_filename
-from flask_login import login_required, current_user, login_user
+from flask_login import login_required, current_user, login_user, logout_user
 import openpyxl
 import random
 import string
@@ -131,6 +131,18 @@ def login_page3():
 
     flash("Chybný email alebo heslo", "danger")
     return render_template("student/login_page.html")
+
+
+@student_bp.route("/logoff")
+@login_required
+def logoff():
+    if "permit" in session:
+        session.pop("permit")
+
+    logout_user()
+    flash("Bol si odhlásený", "success")
+    return redirect(url_for("student_bp.login_page"))
+
 
 
 @student_bp.route("/login/register/<int:code>/", methods=["POST"])

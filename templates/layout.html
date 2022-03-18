@@ -43,14 +43,15 @@
 	{% endwith %}
 
     <nav class="navbar-expand-lg navbar navbar-dark bg-dark">
-      <a class="navbar-brand" style="margin-left:30px;" href="{{ url_for('welcome_page') }}">eSklad</a>
+      <a class="navbar-brand" style="margin-left:30px;" href="#">eSklad</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
-		{% if "permit" in session %}
+		{% if current_user.is_authenticated %}
+		 {% if "permit" in session %}
           <li class="links-items nav-item active">
             <a class="nav-link" id="student" href="{{url_for('student_bp.landing_page')}}">Študenti</a>
           </li>
@@ -69,9 +70,10 @@
           </li>
 
 		{% endif %}
+		{% endif %}
         </ul>
         {% if current_user.is_authenticated %}
-            <a class="btn btn-secondary" style="margin-right:30px;" id="sign_out" href="{{url_for('admin_bp.sign_out')}}">Odhlásiť sa</a>
+            <a class="btn btn-secondary" style="margin-right:30px;" id="sign_out" href="{{url_for('student_bp.logoff')}}">Odhlásiť sa</a>
         {% else %}
             <a class="btn btn-success" style="margin-right:30px;" id="sign_in" href="{{url_for('student_bp.login_page')}}">Prihlásiť sa</a>
         {% endif %}
