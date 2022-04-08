@@ -1,0 +1,312 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Všetky triedy
+{% endblock title %}
+
+
+{% block content %}
+    <script>
+		$(document).ready(function(){
+  		 	$(".active").removeClass("active");
+  		 	$("#student").addClass("active");
+		});
+	</script>
+
+    <style>
+
+        ol > li::marker {
+          font-weight: bold;
+        }
+
+        @media only screen and (max-width: 700px) {
+            .book-list {
+                margin-top:260px;
+                padding-top:15px;
+            }
+            .student-card {
+                margin:10px;
+            }
+            .utilities-buttons {
+                display:none;
+            }
+
+            #myInput {
+                margin: auto;
+                width: 50%;
+                padding: 10px;
+            }
+        }
+
+    </style>
+
+
+
+
+    <div class="container" style="padding-top:100px;">
+        <div class="row">
+            <div class="card student-card col-md-4 col-lg-4 col-sm-12 col-xs-12" style="height:190px;">
+              <div class="card-body">
+                <h3 class="card-title" >Všetky učebnice</h3>
+                <div>
+                    <div>
+                        <strong>Dlžníci:</strong>
+                        <label>{{ stwbc }}</label>
+                    </div>
+                    <div style="margin-top:-8px;">
+                        <strong>Celkovo: </strong>
+                        <label>{{ stac }}</label>
+                    </div>
+                    <div>
+                        <a href="{{ url_for('admin_bp.student_list') }}" style="margin-top:10px;" class="btn btn-sm btn-secondary ">Zobraziť zoznam</a>
+                    </div>
+                </div>
+              </div>
+              <div style="margin-top:20px;" class="d-flex justify-content-center">
+	            	<div class="collapse col-12" id="new-book">
+	            	  <div class="card card-body">
+                        <strong class="" style="padding-bottom:5px;font-size: 18px;">Nový Študent</strong>
+	            	    <form class="needs-validation" action="{{ url_for('admin_bp.new_student') }}" method="post" style="margin-top:10px;" novalidate>
+	            		  <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="50" name="student-name"  type="text" class="form-control mb-2 mr-sm-2" placeholder="Meno Študenta" required>
+                          <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
+                            Zadajte platný názov študenta
+                          </div>
+                          <select style="margin-top:10px;margin-bottom:10px;" class="form-control" name="student-grade">
+                              {% for grade in grades %}
+                                <option>{{ grade.name }}</option>
+                              {% endfor %}
+                          </select>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                          <button type="submit" class="btn btn-success float-right">Pridať</button>
+                        </form>
+	            	  </div>
+	            	</div>
+	           </div>
+                <div class="card card-body d-block d-sm-none" style="margin:-15px;margin-top:2px;">
+                        <strong class="" style="padding-bottom:5px;font-size: 18px;">Nový Študent</strong>
+	            	    <form class="needs-validation" action="{{ url_for('admin_bp.new_student') }}" method="post" style="margin-top:10px;" novalidate>
+	            		  <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="50" name="student-name"  type="text" class="form-control mb-2 mr-sm-2" placeholder="Meno Študenta" required>
+                          <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
+                            Zadajte platný názov študenta
+                          </div>
+                          <select style="margin-top:10px;margin-bottom:10px;" class="form-control" name="student-grade">
+                              {% for grade in grades %}
+                                <option>{{ grade.name }}</option>
+                              {% endfor %}
+                          </select>
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                          <button type="submit" class="btn btn-success float-right">Pridať</button>
+                        </form>
+	            	  </div>
+                <div class="modal fade" id="excelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4 class="modal-title" id="exampleModalLabel">Nastavenia excelu</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div id="main_place" class="modal-body"></div>
+                      <div class="modal-body" id="operation2" style="display:none">
+                          <p>
+                              Pre hromadné nahadzovanie dát z excelu je možné použiť túto funkciu. Vysvetlenie nastavení :
+                          </p>
+                          <ol style="margin-left:-20px;">
+                             <li style="margin-top:5px;"><strong>Prvý riadok</strong> - číslo riadku od akého dáta začínajú</li>
+                             <li style="margin-top:5px;"><strong>Stĺpec Názvu</strong> - číslo stĺpcu na akom sa nachádza meno učebnice</li>
+                             <li style="margin-top:5px;"><strong>Stĺpec Autora</strong> - číslo stĺpcu na akom sa nachádza autor učebnice</li>
+                             <li style="margin-top:5px;"><strong>Stĺpec Kódu</strong> - číslo stĺpcu na akom sa nachádza kód učebnice</li>
+                          </ol>
+                          <p>
+                              Podržte kurzor nad názvami aby sa zobrazil tooltip
+                          </p>
+                      </div>
+                      <div id="operation1" style="display:none">
+                        <form class="needs-validation" action="{{ url_for('book_bp.upload_file') }}" method="post" style="margin-top:10px;" enctype="multipart/form-data" novalidate>
+                          <div class="row">
+                            <div style="padding-top:5px;" class="col">
+                                <label for="numStart" data-tip="tooltip" data-placement="top" title="Riadok kde začínajú dáta s knihamy">Prvý Riadok</label>
+                            </div>
+                            <div class="col">
+                              <input id="numStart" type="number" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="2" class="form-control" required>
+                            </div>
+                            <div style="padding-top:5px;" class="col">
+                                <label for="numName" data-tip="tooltip" data-placement="top" title="Stĺpec kde sa nachádza názov knihy">Stĺpec Názvu</label>
+                            </div>
+                            <div class="col">
+                              <input id="numName" type="number" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="2" class="form-control" required>
+                            </div>
+                          </div>
+                          <div style="padding-top:10px;" class="row">
+                            <div style="padding-top:5px;" class="col">
+                                <label for="numAuthor" data-tip="tooltip" data-placement="bottom" title="Stĺpec kde sa nachádza autor">Stĺpec Autor</label>
+                            </div>
+                            <div class="col">
+                                <input id="numAuthor" type="number" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="2" class="form-control" required>
+                            </div>
+                            <div style="padding-top:5px;" class="col">
+                                <label for="numCode" data-tip="tooltip" data-placement="bottom" title="Stĺpec kde sa nachádza kód knihy">Stĺpec Kódu</label>
+                            </div>
+                            <div class="col">
+                                <input id="numCode" type="number" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="2" class="form-control" required>
+                            </div>
+                          </div>
+                          <div class="form-check" style="padding-top:30px;">
+                              <input id="checkAuto" class="form-check-input" type="checkbox" checked="checked">
+                              <label for="checkAuto" class="form-check-label" data-tip="tooltip" data-placement="bottom" title="Ak kniha s daným názvom ešte nie je, vytvorí sa automaticky nová.">
+                                Vytvoriť nový typ pri nenájdenej zhode
+                              </label>
+                            </div>
+                          <div class="custom-file" style="margin-top:20px;">
+                            <input type="file" name="file" class="custom-file-input" id="customFile" required>
+                            <label class="custom-file-label" for="customFile">Vyber súbor</label>
+                          </div>
+                          <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
+                            Vyber platný súbor
+                          </div>
+
+                           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button id="help-button" type="button" onclick="show('operation2')" class="btn mr-auto btn-warning">
+                            <img src="{{ url_for('static',filename='images/help_icon.png') }}" height="25">
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavrieť</button>
+                        <button type="button" class="btn btn-primary">Načítať</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+               <div style="margin-top:20px;" class="d-flex justify-content-center">
+                    <button id="add-book" class="btn btn-primary utilities-buttons" onclick="moveModal" type="button" data-toggle="collapse" data-target="#new-book" aria-expanded="false" aria-controls="new-book">
+	                   + Pridať študenta
+	                </button>
+                   <button id="excel-book" style="margin-left:5px;" onclick="changeDiv('operation1')" class="btn btn-secondary utilities-buttons" type="button" data-toggle="modal" data-target="#excelModal">
+	                   Načítať excel
+	                </button>
+
+               </div>
+            </div>
+            <div id="book-list" class="book-list col-md-8 col-lg-8 col-sm-12 col-xs-12">
+                <div  id="book-list2">
+                    <input placeholder="Vyhľadať triedu" type="text" class="form-control" style="width:200px;" id="myInput">
+
+                </div>
+
+                <div id="myTable">
+                    {% if grades %}
+                        {% for grade in grades %}
+                              <div style="margin-top:10px;" class="card">
+                              <div class="card-body">
+
+                                <div class="container">
+                                    <div class="row">
+                                        <img class="inline img-grade" height="30" src="{{url_for('static',filename='images/class_icon.jpg')}}">
+                                        <div style="margin-left:10px;" class="col-8">
+                                            <h5><a href="{{ url_for('admin_bp.landing_page_grade',grade=grade.name) }}" style="text-decoration:none;color:black;">{{ grade.name }}</a></h5>
+                                        </div>
+                                        <div class="col-8" style="margin-left:50px;margin-top:px;margin-bottom:-5px;">
+                                            <strong>Celkovo:</strong>
+                                            <label>{{ grade.students | length }}</label>
+                                        </div>
+                                    </div>
+                                </div>
+                              </div>
+                            </div>
+
+                        {% endfor %}
+                    {% else %}
+                        <label style="padding-left:20px;padding-top:10px;">Žiadne triedy</label>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script>
+    $(document).ready(function(){
+          $("#live-search-box").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#books-table tr:not(.header)").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+        });
+     $(document).ready(function(){
+          $("#myInput").on("keyup", function() {
+            var value = $(this).val().toLowerCase();
+            $("#myTable div").filter(function() {
+              $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+            });
+          });
+        });
+
+     function show(param_div_id) {
+          if (param_div_id === 'operation2') {
+            document.getElementById( "help-button" ).setAttribute( "onClick", "show('operation1')" );
+            document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
+
+          } else {
+            document.getElementById( "help-button" ).setAttribute( "onClick", "show('operation2')" );
+            document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
+            $('[data-tip="tooltip"]').tooltip()
+          }
+        }
+     function changeDiv(param_div_id) {
+        document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
+        $('[data-tip="tooltip"]').tooltip()
+     }
+
+        // script to check input
+	    (function() {
+          'use strict';
+          window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+              form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+              }, false);
+            });
+          }, false);
+        })();
+
+
+
+        function hideFunction() {
+          var x = document.getElementById("original-grade");
+          var y = document.getElementById("grade-form");
+          if (x.style.display === "none") {
+            x.style.display = "block";
+            y.style.display = "none";
+          } else {
+            x.style.display = "none";
+            y.style.display = "block";
+          }
+        }
+
+        $(document).ready(function(){
+	     $('#add-book').on('click', function () {
+	      var text=$('#add-book').text();
+	      if(text === "- Pridať študenta"){
+	        $(this).html('+ Pridať študenta');
+	      } else{
+	        $(this).text('- Pridať študenta');
+	     }
+	    });
+	    });
+
+    </script>
+
+{% endblock content %}

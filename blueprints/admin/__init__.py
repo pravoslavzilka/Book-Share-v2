@@ -1,9 +1,10 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from flask_login import login_user, login_required, logout_user, current_user
-from models import User, Student
+from models import User, Student, Grade
 from database import db_session
 from functools import wraps
 from random import *
+import string
 
 
 admin_bp = Blueprint("admin_bp",__name__,template_folder="templates",static_folder="static")
@@ -20,36 +21,35 @@ def check_admin(func):
 
 
 @admin_bp.route("/all/")
-@login_required
+@check_admin
 def landing_page():
     grades = Grade.query.all()
     students = Student.query.all()
     students_w_book = Student.query.filter(Student.books != None).all()
-    return render_template("student/landing_page.html", grades=grades, students=students, stac=len(students), stwbc=len(students_w_book))
+    return render_template("admin/landing_page.html", grades=grades, students=students, stac=len(students), stwbc=len(students_w_book))
 
 
 @admin_bp.route("/grade/<grade>/")
-@login_required
+@check_admin
 def landing_page_grade(grade):
-    grades = Grade.query.all()
     cer_grade = Grade.query.filter(Grade.name == grade).first()
 
     if cer_grade:
         stwbc = Student.query.filter(Student.grade == cer_grade, Student.books != None).all()
-        return render_template("student/class_page.html", grade=cer_grade, students=cer_grade.students, stwbc=len(stwbc))
+        return render_template("admin/class_page.html", grade=cer_grade, students=cer_grade.students, stwbc=len(stwbc))
     flash(f"Trieda {grade} neexistuje","danger")
-    return redirect(url_for("student_bp.landing_page"))
+    return redirect(url_for("admin_bp.landing_page"))
 
 
 @admin_bp.route("/list/")
-@login_required
+@check_admin
 def student_list():
     students = Student.query.all()
-    return render_template("student/student_list.html", students=students)
+    return render_template("admin/student_list.html", students=students)
 
 
 @admin_bp.route("/new_student/",methods=["POST"])
-@login_required
+@check_admin
 def new_student():
     name = request.form["student-name"]
     s_grade = request.form["student-grade"]
@@ -58,19 +58,19 @@ def new_student():
     code_student = Student.query.filter(Student.code == code).first()
     if code_student:
         flash(f"Žiak s kódom {code} už existuje","danger")
-        return redirect(url_for("student_bp.landing_page"))
+        return redirect(url_for("admin_bp.landing_page"))
     if grade:
         n_student = Student(name,grade,int(code))
         db_session.add(n_student)
         db_session.commit()
         flash(f"Študent {n_student.name} bol úspešne pridaný", "success")
-        return redirect(url_for("student_bp.landing_page"))
+        return redirect(url_for("admin_bp.landing_page"))
     flash(f"Trieda {s_grade} neexistuje", "danger")
-    return redirect(url_for("student_bp.landing_page"))
+    return redirect(url_for("admin_bp.landing_page"))
 
 
 @admin_bp.route("/move_all_students_up/")
-@login_required
+@check_admin
 def move_all_s_up():
 
     grades = ["Prima", "Sekunda", "Tercia", "Kvarta", "Kvinta", "Sexta", "Septima", "Oktava",
@@ -91,11 +91,11 @@ def move_all_s_up():
         db_session.commit()
 
     flash("Všetci študenti prešli do vyšieho ročníka", "success")
-    return redirect(url_for("student_bp.landing_page"))
+    return redirect(url_for("admin_bp.student_list"))
 
 
 @admin_bp.route("/move_all_students_down/")
-@login_required
+@check_admin
 def move_all_s_down():
 
     grades = ["Prima", "Sekunda", "Tercia", "Kvarta", "Kvinta", "Sexta", "Septima", "Oktava",
@@ -116,11 +116,11 @@ def move_all_s_down():
         db_session.commit()
 
     flash("Všetci študenti prešli do nižšieho ročníka", "success")
-    return redirect(url_for("student_bp.landing_page"))
+    return redirect(url_for("admin_bp.student_list"))
 
 
 @admin_bp.route("/change_grade/for/<int:student_id>/",methods=["POST"])
-@login_required
+@check_admin
 def change_student(student_id):
     new_name = request.form["student_name"]
     new_code = request.form["student_code"]
@@ -129,12 +129,12 @@ def change_student(student_id):
     student = Student.query.filter(Student.id == student_id).first()
     if not student:
         flash("Neplatný kód študenta","danger")
-        return redirect(url_for("student_bp.landing_page"))
+        return redirect(url_for("admin_bp.landing_page"))
     code_student = Student.query.filter(Student.code == new_code).first()
 
     if code_student and code_student.id != student.id:
         flash("Študent s takýmto kódom už existuje","danger")
-        return redirect(url_for("student_bp.view_student",student_id=student_id))
+        return redirect(url_for("admin_bp.view_student",student_id=student_id))
 
     student.name = new_name
     student.code = new_code
@@ -142,11 +142,11 @@ def change_student(student_id):
     db_session.commit()
 
     flash(f"Údaje študenta {student.name} boli úspešne zmenené", "success")
-    return redirect(url_for("student_bp.view_student", student_id=student_id))
+    return redirect(url_for("admin_bp.view_student", student_id=student_id))
 
 
 @admin_bp.route("/<int:student_id>/return_book/<int:book_id>/")
-@login_required
+@check_admin
 def return_book(student_id,book_id):
 
     book = Book.query.filter(Book.id == book_id).first()
@@ -157,35 +157,35 @@ def return_book(student_id,book_id):
         db_session.commit()
         flash("Učebnica bola vrátená","success")
 
-        return redirect(url_for("student_bp.view_student",student_id=student_id))
+        return redirect(url_for("admin_bp.view_student",student_id=student_id))
     else:
-        return redirect(url_for("student_bp.landing_page"))
+        return redirect(url_for("admin_bp.landing_page"))
 
 
 @admin_bp.route("/<int:student_id>/return_all/")
-@login_required
+@check_admin
 def return_all(student_id):
     student = Student.query.filter(Student.id == student_id).first()
     if not student:
-        return redirect(url_for("student_bp.landing_page"))
+        return redirect(url_for("admin_bp.landing_page"))
 
     student.books.clear()
     db_session.commit()
     flash(f"Všetky učebnice žiaka {student.name} boli úspešne vrátené","success")
 
-    return redirect(url_for("student_bp.view_student",student_id=student_id))
+    return redirect(url_for("admin_bp.view_student",student_id=student_id))
 
 
 @admin_bp.route("/delete/<int:student_id>/")
-@login_required
+@check_admin
 def delete_student(student_id):
     student = Student.query.filter(Student.id == student_id).first()
     if not student:
-        return redirect(url_for("student_bp.landing_page"))
+        return redirect(url_for("admin_bp.landing_page"))
     db_session.delete(student)
     db_session.commit()
     flash(f"Študent {student.name} bol úspešne vymazaný","success")
-    return redirect(url_for("student_bp.landing_page"))
+    return redirect(url_for("admin_bp.landing_page"))
 
 
 def create_number():
@@ -203,7 +203,7 @@ def allowed_file(filename):
 
 
 @admin_bp.route('/upload/source/excel/',methods=["POST"])
-@login_required
+@check_admin
 def upload_file():
 
     file = request.files['file']
@@ -232,11 +232,11 @@ def upload_file():
             db_session.commit()
         except:
             flash("Nastala chyba pri nahrávaní. Ujistite sa, či študenti z tabuľky nie su už v systéme", "danger")
-            return redirect(url_for("student_bp.landing_page"))
+            return redirect(url_for("admin_bp.landing_page"))
 
         flash("Študenti z execelu boli úspešne pridaný","success")
-        return redirect(url_for("student_bp.landing_page"))
+        return redirect(url_for("admin_bp.landing_page"))
 
     allow_f_string = ' / '.join(map(str, ALLOWED_EXTENSIONS))
     flash(f"Súbor nie je podporovaný. Typ súboru musí byť: {allow_f_string}","danger")
-    return redirect(url_for("student_bp.landing_page"))
+    return redirect(url_for("admin_bp.landing_page"))

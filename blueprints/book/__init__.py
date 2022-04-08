@@ -1,9 +1,10 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from database import db_session
 from models import Grade, Student, Book, BookType
 from werkzeug.utils import secure_filename
 from flask_login import login_required
 import openpyxl
+from functools import wraps
 
 
 book_bp = Blueprint("book_bp",__name__,template_folder="templates")
@@ -11,8 +12,18 @@ book_bp = Blueprint("book_bp",__name__,template_folder="templates")
 ALLOWED_EXTENSIONS = {'xlsx','xlsm','xltx','xltm'}
 
 
+def check_admin(func):
+    @wraps(func)
+    def inner(*args, **kwargs):
+        if "permit" in session:
+            if session["permit"] == 1:
+                return func(*args, **kwargs)
+        return redirect(url_for("admin_bp.login_page"))
+    return inner
+
+
 @book_bp.route("/all/")
-@login_required
+@check_admin
 def landing_page():
     books = Book.query.all()
     free_books = Book.query.filter(Book.student == None).count()
@@ -27,7 +38,7 @@ def landing_page():
 
 
 @book_bp.route("/type/<bt_name>/")
-@login_required
+@check_admin
 def book_type_page(bt_name):
     book_type = BookType.query.filter(BookType.name == bt_name).first()
 
@@ -41,7 +52,7 @@ def book_type_page(bt_name):
 
 
 @book_bp.route("/total_list/")
-@login_required
+@check_admin
 def list_of_books():
     books = Book.query.all()
     book_types = BookType.query.all()
@@ -49,7 +60,7 @@ def list_of_books():
 
 
 @book_bp.route("/list/<book_state>/")
-@login_required
+@check_admin
 def books_state(book_state):
     book_types = BookType.query.all()
     if book_state == "free":
@@ -61,7 +72,7 @@ def books_state(book_state):
 
 
 @book_bp.route("/add_new/in/<bt_name>/",methods=["POST"])
-@login_required
+@check_admin
 def add_book_with_type(bt_name):
     book_code = request.form["book_code"]
     book = Book.query.filter(Book.code == book_code).first()
@@ -85,13 +96,13 @@ def add_book_with_type(bt_name):
 
 
 @book_bp.route("/return/",methods=["GET"])
-@login_required
+@check_admin
 def return_book_view():
     return render_template("book/return_book.html")
 
 
 @book_bp.route("/return/",methods=["POST"])
-@login_required
+@check_admin
 def return_book():
     code = int(request.form["book_code"])
     try:
@@ -113,7 +124,7 @@ def return_book():
 
 
 @book_bp.route("/return/from/list/",methods=["POST"])
-@login_required
+@check_admin
 def return_book_from_list():
     code = int(request.form["book_code"])
     try:
@@ -135,7 +146,7 @@ def return_book_from_list():
 
 
 @book_bp.route("/return/with/type/",methods=["POST"])
-@login_required
+@check_admin
 def return_book_with_type():
     code = int(request.form["book_code"])
     try:
@@ -157,7 +168,7 @@ def return_book_with_type():
 
 
 @book_bp.route("/delete/",methods=['POST'])
-@login_required
+@check_admin
 def delete_book():
     book_code = int(request.form["book_code"])
     try:
@@ -178,7 +189,7 @@ def delete_book():
 
 
 @book_bp.route("/delete/from/list/",methods=['POST'])
-@login_required
+@check_admin
 def delete_book_from_list():
     book_code = int(request.form["book_code"])
     try:
@@ -194,7 +205,7 @@ def delete_book_from_list():
 
 
 @book_bp.route("/add_type/",methods=["POST"])
-@login_required
+@check_admin
 def add_book_type():
     req_bt = request.form["book_name"]
     req_ba = request.form["book_author"]
@@ -222,7 +233,7 @@ def add_book_type():
 
 
 @book_bp.route("/update/type/<int:type_id>/", methods=["POST"])
-@login_required
+@check_admin
 def update_book_type(type_id):
     book_type = BookType.query.filter(BookType.id == type_id).first()
 
@@ -239,7 +250,7 @@ def update_book_type(type_id):
 
 
 @book_bp.route("/delete/type/<int:type_id>/")
-@login_required
+@check_admin
 def delete_type(type_id):
 
     try:
@@ -269,7 +280,7 @@ def allowed_file(filename):
 
 
 @book_bp.route('/upload/source/excel/',methods=["POST"])
-@login_required
+@check_admin
 def upload_file():
 
     file = request.files['file']

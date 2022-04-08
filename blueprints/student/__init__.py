@@ -121,13 +121,14 @@ def login_page3():
         try:
             check = request.form["remember_me"]
             login_user(admin, remember=True)
+
         except:
             login_user(admin)
 
         session["permit"] = 1
 
         flash("Vitaj späť", "success")
-        return redirect(url_for("welcome_page"))
+        return redirect(url_for("admin_bp.landing_page"))
 
     flash("Chybný email alebo heslo", "danger")
     return render_template("student/login_page.html")
@@ -144,11 +145,18 @@ def logoff():
     return redirect(url_for("student_bp.login_page"))
 
 
-
 @student_bp.route("/login/register/<int:code>/", methods=["POST"])
 def finish_registration(code):
     student = Student.query.filter(Student.code == code).first()
     if student:
+        st_check = Student.query.filter(Student.email == request.form["student-email"]).first()
+        ad_check = User.query.filter(User.email == request.form["student-email"]).first()
+
+        if st_check or ad_check:
+            flash("Email sa už používa", "danger")
+            print("sdfsd")
+            return render_template("student/login_page.html", register_bool=True)
+
         student.email = request.form["student-email"]
         student.set_password(request.form["student-password"])
         student.authorized = True
@@ -164,8 +172,8 @@ def finish_registration(code):
                 student.tags.append(n_tag)
 
         db_session.commit()
-        flash("Profil vytvorený", "success")
-        return render_template("student/login_page.html", register_bool=True)
+        flash("Profil vytvorený, môžeš as prihlásiť", "success")
+        return render_template("student/login_page.html")
 
     flash("Neplatný kód", "danger")
     return render_template("student/login_page.html", register_bool=True)
