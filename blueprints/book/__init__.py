@@ -9,7 +9,7 @@ from functools import wraps
 
 book_bp = Blueprint("book_bp",__name__,template_folder="templates")
 
-ALLOWED_EXTENSIONS = {'xlsx','xlsm','xltx','xltm'}
+ALLOWED_EXTENSIONS = {'xlsx', 'xlsm', 'xltx', 'xltm'}
 
 
 def check_admin(func):
@@ -32,8 +32,8 @@ def landing_page():
 
     book_types = BookType.query.all()
 
-    return render_template("book/landing_page.html",books=books,book_types=book_types,
-                           ctbooks=total_books,cfbooks=free_books,crbooks=rent_books
+    return render_template("book/landing_page.html", books=books, book_types=book_types,
+                           ctbooks=total_books, cfbooks=free_books, crbooks=rent_books
                            )
 
 
