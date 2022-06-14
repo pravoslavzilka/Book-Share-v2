@@ -46,6 +46,68 @@
 
 
     <div class="container" style="padding-top:100px;">
+
+        <div class="modal fade" id="excelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4 class="modal-title" id="exampleModalLabel">Nastavenia excelu</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div id="main_place" class="modal-body"></div>
+                      <div class="modal-body" id="operation2" style="display:none">
+                          <p>
+                              Pre hromadné nahadzovanie dát z excelu je možné použiť túto funkciu. Vysvetlenie nastavení :
+                          </p>
+                          <ol style="margin-left:-20px;">
+                             <li style="margin-top:5px;"><strong>Prvý riadok</strong> - číslo riadku od akého dáta začínajú</li>
+                             <li style="margin-top:5px;"><strong>Stĺpec Mena</strong> - číslo stĺpcu na akom sa nachádza meno študenta</li>
+
+                          </ol>
+                          <p>
+                              Podržte kurzor nad názvami aby sa zobrazil tooltip
+                          </p>
+                      </div>
+                      <div id="operation1" style="display:none">
+                        <form id="excelForm" class="needs-validation" action="{{ url_for('admin_bp.upload_file') }}" method="post" style="margin-top:10px;" enctype="multipart/form-data" novalidate>
+                          <div class="row">
+                            <div style="padding-top:5px;" class="col">
+                                <label for="numStart" data-tip="tooltip" data-placement="top" title="Riadok kde začínajú dáta so študentami">Prvý Riadok</label>
+                            </div>
+                            <div class="col">
+                              <input id="numStart" name="start_point" type="number" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="2" class="form-control" required>
+                            </div>
+                            <div style="padding-top:5px;" class="col">
+                                <label for="numName" data-tip="tooltip" data-placement="top" title="Stĺpec kde sa nachádza meno študenta">Stĺpec Mena</label>
+                            </div>
+                            <div class="col">
+                              <input id="numName" name="name_column" type="number" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="2" class="form-control" required>
+                            </div>
+                          </div>
+
+                          <div class="custom-file" style="margin-top:20px;">
+                            <input type="file" name="file" class="custom-file-input" id="customFile" required>
+                            <label class="custom-file-label" for="customFile">Vyber súbor</label>
+                          </div>
+                          <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
+                            Vyber platný súbor
+                          </div>
+                           <input type="hidden" name="grade" value="{{ grade.name }}"/>
+                           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button id="help-button" type="button" onclick="show('operation2')" class="btn mr-auto btn-warning">
+                            <img src="{{ url_for('static',filename='images/help_icon.png') }}" height="25">
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavrieť</button>
+                        <button type="submit" form="excelForm" class="btn btn-primary">Načítať</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
         <div class="row">
             <div class="card book-type-card col-md-4 col-lg-4 col-sm-12 col-xs-12" >
               <div class="card-body">
@@ -96,6 +158,10 @@
 	                   + Pridať študenta
 	                </button>
 
+                   <button id="excel-book" style="margin-left:5px;" onclick="changeDiv('operation1')" class="btn btn-secondary utilities-buttons" type="button" data-toggle="modal" data-target="#excelModal">
+	                   Načítať excel
+	                </button>
+
                </div>
             </div>
             <div id="book-list" class="book-list col-md-8 col-lg-8 col-sm-12 col-xs-12">
@@ -136,27 +202,24 @@
 
 
 
+
     <script>
+        function show(param_div_id) {
+          if (param_div_id === 'operation2') {
+            document.getElementById( "help-button" ).setAttribute( "onClick", "show('operation1')" );
+            document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
+
+          } else {
+            document.getElementById( "help-button" ).setAttribute( "onClick", "show('operation2')" );
+            document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
+            $('[data-tip="tooltip"]').tooltip()
+          }
+        }
+         function changeDiv(param_div_id) {
+            document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
+            $('[data-tip="tooltip"]').tooltip()
+         }
         // script for sending data to "delete a book" modal
-        $('#modalForDelete').on('show.bs.modal', function (event) {
-          var button = $(event.relatedTarget) // Button that triggered the modal
-          var recipient = button.data('bookcode') // Extract info from data-* attributes
-
-          var modal = $(this)
-          modal.find('.modal-body .main-text').text("Naozaj chcete odstrániť učebnicu s kódom " + recipient)
-          modal.find('.modal-body .book-code-div input').val(recipient)
-        })
-
-
-        // script for sending data to "return a book" modal
-        $('#modalForReturn').on('show.bs.modal', function (event) {
-          var button = $(event.relatedTarget) // Button that triggered the modal
-          var recipient = button.data('bookcode') // Extract info from data-* attributes
-
-          var modal = $(this)
-          modal.find('.modal-body .main-text').text("Naozaj chcete vrátiť učebnicu s kódom " + recipient)
-          modal.find('.modal-body .book-code-div input').val(recipient)
-        })
 
 
         // script for jQuery search in table
@@ -168,23 +231,6 @@
             });
           });
         });
-
-        function show(param_div_id) {
-          if (param_div_id === 'operation1') {
-            if ($(window).width() > 600) {
-                $(".book-type-card").css("height","245px");
-            } else {
-                $(".book-type-card").css("height","320px");
-            }
-          } else {
-            if ($(window).width() > 600) {
-                $(".book-type-card").css("height","225px");
-            } else {
-                $(".book-type-card").css("height","260px");
-            }
-          }
-          document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
-        }
 
         $(document).ready(function(){
 	     $('#add-book').on('click', function () {

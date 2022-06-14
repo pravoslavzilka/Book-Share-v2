@@ -7,7 +7,7 @@ import openpyxl
 from functools import wraps
 
 
-book_bp = Blueprint("book_bp",__name__,template_folder="templates")
+book_bp = Blueprint("book_bp", __name__, template_folder="templates")
 
 ALLOWED_EXTENSIONS = {'xlsx', 'xlsm', 'xltx', 'xltm'}
 

@@ -1,13 +1,17 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from flask_login import login_user, login_required, logout_user, current_user
 from models import User, Student, Grade
+from werkzeug.utils import secure_filename
+import openpyxl
 from database import db_session
 from functools import wraps
 from random import *
 import string
 
 
-admin_bp = Blueprint("admin_bp",__name__,template_folder="templates",static_folder="static")
+admin_bp = Blueprint("admin_bp", __name__, template_folder="templates", static_folder="static")
+
+ALLOWED_EXTENSIONS = {'xlsx', 'xlsm', 'xltx', 'xltm'}
 
 
 def check_admin(func):
@@ -16,7 +20,7 @@ def check_admin(func):
         if "permit" in session:
             if session["permit"] == 1:
                 return func(*args, **kwargs)
-        return redirect(url_for("admin_bp.login_page"))
+        return redirect(url_for("student_bp.login_page"))
     return inner
 
 
@@ -202,7 +206,7 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@admin_bp.route('/upload/source/excel/',methods=["POST"])
+@admin_bp.route('/upload/source/excel/', methods=["POST"])
 @check_admin
 def upload_file():
 
@@ -217,18 +221,19 @@ def upload_file():
         sheet_obj = wb_obj.active
 
         grade_name = request.form["grade"]
+        start_point = int(request.form["start_point"])
+        name_column = int(request.form["name_column"])
 
         try:
-            for i in range(1,sheet_obj.max_row):
-                s_name = sheet_obj.cell(row=i+1, column=2).value
-                s_code = sheet_obj.cell(row=i + 1, column=3).value
-                g_name = sheet_obj.cell(row=i+1, column=4).value
+            for i in range(1, sheet_obj.max_row):
+                s_name = sheet_obj.cell(row=i+start_point-1, column=name_column).value
 
-                grade = Grade.query.filter(Grade.name == g_name).first()
-                # code = create_number()
+                if s_name:
+                    grade = Grade.query.filter(Grade.name == grade_name).first()
+                    code = create_number()
 
-                n_student = Student(s_name, grade, s_code)
-                db_session.add(n_student)
+                    n_student = Student(s_name, grade, code)
+                    db_session.add(n_student)
             db_session.commit()
         except:
             flash("Nastala chyba pri nahrávaní. Ujistite sa, či študenti z tabuľky nie su už v systéme", "danger")
