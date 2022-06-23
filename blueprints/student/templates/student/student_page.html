@@ -319,9 +319,11 @@
         </div>
     </div>
 
-    <div class="d-flex justify-content-center" style="margin-top:130px;">
-        <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#ar_u_s">Vymazať typ učebnice</button>
-    </div>
+    {% if "permit" in session %}
+        <div class="d-flex justify-content-center" style="margin-top:130px;">
+            <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#ar_u_s">Vymazať typ učebnice</button>
+        </div>
+    {% endif %}
 
     <div class="modal fade" id="modalForDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog modal-dialog-centered" role="document">

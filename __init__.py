@@ -47,7 +47,7 @@ login_manager.session_protection = "strong"
 
 @app.route("/")
 def welcome_page():
-    return redirect(url_for("student_bp.search_student"))
+    return redirect(url_for("student_bp.login_page"))
 
 
 @app.errorhandler(404)
