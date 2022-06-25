@@ -52,7 +52,7 @@ def student_list():
     return render_template("admin/student_list.html", students=students)
 
 
-@admin_bp.route("/new_student/",methods=["POST"])
+@admin_bp.route("/new_student/", methods=["POST"])
 @check_admin
 def new_student():
     name = request.form["student-name"]
@@ -68,9 +68,9 @@ def new_student():
         db_session.add(n_student)
         db_session.commit()
         flash(f"Študent {n_student.name} bol úspešne pridaný", "success")
-        return redirect(url_for("admin_bp.landing_page"))
+        return redirect(url_for("admin_bp.landing_page_grade", grade=grade.name))
     flash(f"Trieda {s_grade} neexistuje", "danger")
-    return redirect(url_for("admin_bp.landing_page"))
+    return redirect(url_for("admin_bp.landing_page_grade", grade=grade.name))
 
 
 @admin_bp.route("/move_all_students_up/")
@@ -184,12 +184,13 @@ def return_all(student_id):
 @check_admin
 def delete_student(student_id):
     student = Student.query.filter(Student.id == student_id).first()
+    grade = student.grade
     if not student:
         return redirect(url_for("admin_bp.landing_page"))
     db_session.delete(student)
     db_session.commit()
     flash(f"Študent {student.name} bol úspešne vymazaný","success")
-    return redirect(url_for("admin_bp.landing_page"))
+    return redirect(url_for("admin_bp.landing_page_grade", grade=grade.name))
 
 
 def create_number():
@@ -240,7 +241,7 @@ def upload_file():
             return redirect(url_for("admin_bp.landing_page"))
 
         flash("Študenti z execelu boli úspešne pridaný","success")
-        return redirect(url_for("admin_bp.landing_page"))
+        return redirect(url_for("admin_bp.landing_page_grade", grade=grade_name))
 
     allow_f_string = ' / '.join(map(str, ALLOWED_EXTENSIONS))
     flash(f"Súbor nie je podporovaný. Typ súboru musí byť: {allow_f_string}","danger")

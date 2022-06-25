@@ -10,6 +10,7 @@
 		$(document).ready(function(){
   		 	$(".active").removeClass("active");
   		 	$("#account").addClass("active");
+  		 	$("#student").addClass("active");
 		});
 	</script>
 
@@ -186,7 +187,7 @@
 
     <div class="container" style="padding-top:100px;">
         <div class="row">
-            <div class="card student-card col-md-4 col-lg-4 col-sm-12 col-xs-12" style="height:190px;">
+            <div class="card student-card col-md-4 col-lg-4 col-sm-12 col-xs-12" style="height:150px;">
               <div class="card-body">
                 <div id="operation2" style="display:none">
                     <h3 class="card-title">{{student.name}}</h3>
@@ -218,33 +219,12 @@
                         <strong>Kód: </strong>
                         <label>{{ student.code }}</label>
                     </div>
-                    <div style="margin-top:2px;">
-                        <strong style="margin-right:5px;" >Tagy: </strong>
-                        {% for tag in student.tags %}
-                            <label class="tag">{{ tag.name }}</label>
-                        {% endfor %}
-                    </div>
+
 
 
 
                 </div>
-                <div id="operation1" style="display:none">
-                    <form method="post" class="needs-validation">
-                      <h4 style="padding-bottom:10px;">Upraviť tagy:</h4>
-                      <div class="form-label-group">
-                          <div class="form-group row">
-                                <input name="student-tags" type="text" id="tag-input1">
-                          </div>
-                      </div>
 
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                      <div style="padding-top:15px;">
-                          <button type="submit" class="btn btn-sm btn-success">Uložiť zmeny</button>
-                          <button onclick="show('operation2')" class="btn btn-sm btn-secondary ">Vrátiť</button>
-                      </div>
-                    </form>
-
-                </div>
 
               </div>
               <div style="margin-top:20px;" class="d-flex justify-content-center add-book-m">
@@ -256,7 +236,6 @@
                           <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
                             Zadaj platný kód učebnice
                           </div>
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                           <button type="submit" class="btn btn-success mb-2">Pridať</button>
 	            		</form>
@@ -297,11 +276,13 @@
                                         <div style="margin-left:10px;" class="col-8">
                                             <h5>{{ book.book_type.name }}</h5>
                                         </div>
-
                                         <div style="margin-left:50px;" class="col-8">
                                             <strong>Autor:</strong>
                                             <label>{{ book.book_type.author }}</label>
                                         </div>
+                                        {% if "permit" in session %}
+                                            <a class="btn btn-info float-left" href="{{ url_for('book_bp.return_book_s_page', book_code=book.code) }}" style="color:white" data-dismiss="modal">Vrátiť</a>
+                                        {% endif %}
                                         <div class="col-8" style="margin-left:50px;margin-top:-10px;margin-bottom:-5px;">
                                             <strong>Kód:</strong>
                                             <label>{{ book.code }}</label>
@@ -321,7 +302,7 @@
 
     {% if "permit" in session %}
         <div class="d-flex justify-content-center" style="margin-top:130px;">
-            <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#ar_u_s">Vymazať typ učebnice</button>
+            <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#modalForDelete">Vymazať študenta</button>
         </div>
     {% endif %}
 
@@ -329,23 +310,17 @@
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Odstránenie učebnice</h5>
+            <h5 class="modal-title" id="exampleModalLabel">Vymazanie študenta</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
           <div class="modal-body">
             <div class="main-text" style="padding-bottom:20px;">
-
+                Naozaj chcete vymazať študenta ?
             </div>
-            <form method="post" action="{{ url_for('book_bp.delete_book') }}">
-              <div class="form-group book-code-div d-none">
-                <input id="book_code" type="number" name="book_code" class="form-control">
-              </div>
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-              <button type="submit" class="btn btn-danger float-right">Odstrániť</button>
+              <a href="{{ url_for('admin_bp.delete_student', student_id=student.id) }}" class="btn btn-danger float-right">Vymazať</a>
               <button type="button" class="btn btn-secondary float-right" style="margin-right:5px;" data-dismiss="modal">Zrušiť</button>
-            </form>
           </div>
         </div>
       </div>
@@ -354,16 +329,6 @@
 
 
     <script>
-
-        // script for sending data to "delete a book" modal
-        $('#modalForDelete').on('show.bs.modal', function (event) {
-          var button = $(event.relatedTarget) // Button that triggered the modal
-          var recipient = button.data('bookcode') // Extract info from data-* attributes
-
-          var modal = $(this)
-          modal.find('.modal-body .main-text').text("Naozaj chcete odstrániť učebnicu s kódom " + recipient)
-          modal.find('.modal-body .book-code-div input').val(recipient)
-        })
 
         // script to check input
 	    (function() {
@@ -408,181 +373,6 @@
 	     }
 	    });
 	    });
-
-
-    (function(){
-
-    "use strict"
-
-	// Plugin Constructor
-    var TagsInput = function(opts){
-        this.options = Object.assign(TagsInput.defaults , opts);
-        this.init();
-    }
-
-    // Initialize the plugin
-    TagsInput.prototype.init = function(opts){
-        this.options = opts ? Object.assign(this.options, opts) : this.options;
-
-        if(this.initialized)
-            this.destroy();
-
-        if(!(this.orignal_input = document.getElementById(this.options.selector)) ){
-            console.error("tags-input couldn't find an element with the specified ID");
-            return this;
-        }
-
-        this.arr = [];
-        this.wrapper = document.createElement('div');
-        this.input = document.createElement('input');
-        init(this);
-        initEvents(this);
-
-        this.initialized =  true;
-        return this;
-    }
-
-    // Add Tags
-    TagsInput.prototype.addTag = function(string){
-
-        if(this.anyErrors(string))
-            return ;
-
-        this.arr.push(string);
-        var tagInput = this;
-
-        var tag = document.createElement('span');
-        tag.className = this.options.tagClass;
-        tag.innerText = string;
-
-        var closeIcon = document.createElement('a');
-        closeIcon.innerHTML = '&times;';
-
-        // delete the tag when icon is clicked
-        closeIcon.addEventListener('click' , function(e){
-            e.preventDefault();
-            var tag = this.parentNode;
-
-            for(var i =0 ;i < tagInput.wrapper.childNodes.length ; i++){
-                if(tagInput.wrapper.childNodes[i] == tag)
-                    tagInput.deleteTag(tag , i);
-            }
-        })
-
-
-        tag.appendChild(closeIcon);
-        this.wrapper.insertBefore(tag , this.input);
-        this.orignal_input.value = this.arr.join(',');
-
-        return this;
-    }
-
-    // Delete Tags
-    TagsInput.prototype.deleteTag = function(tag , i){
-        tag.remove();
-        this.arr.splice( i , 1);
-        this.orignal_input.value =  this.arr.join(',');
-        return this;
-    }
-
-    // Make sure input string have no error with the plugin
-    TagsInput.prototype.anyErrors = function(string){
-        if( this.options.max != null && this.arr.length >= this.options.max ){
-            console.log('max tags limit reached');
-            return true;
-        }
-
-        if(!this.options.duplicate && this.arr.indexOf(string) != -1 ){
-            console.log('duplicate found " '+string+' " ')
-            return true;
-        }
-
-        return false;
-    }
-
-    // Add tags programmatically
-    TagsInput.prototype.addData = function(array){
-        var plugin = this;
-
-        array.forEach(function(string){
-            plugin.addTag(string);
-        })
-        return this;
-    }
-
-    // Get the Input String
-    TagsInput.prototype.getInputString = function(){
-        return this.arr.join(',');
-    }
-
-
-    // destroy the plugin
-    TagsInput.prototype.destroy = function(){
-        this.orignal_input.removeAttribute('hidden');
-
-        delete this.orignal_input;
-        var self = this;
-
-        Object.keys(this).forEach(function(key){
-            if(self[key] instanceof HTMLElement)
-                self[key].remove();
-
-            if(key != 'options')
-                delete self[key];
-        });
-
-        this.initialized = false;
-    }
-
-    // Private function to initialize the tag input plugin
-    function init(tags){
-        tags.wrapper.append(tags.input);
-        tags.wrapper.classList.add(tags.options.wrapperClass);
-        tags.orignal_input.setAttribute('hidden' , 'true');
-        tags.orignal_input.parentNode.insertBefore(tags.wrapper , tags.orignal_input);
-    }
-
-    // initialize the Events
-    function initEvents(tags){
-        tags.wrapper.addEventListener('click' ,function(){
-            tags.input.focus();
-        });
-
-
-        tags.input.addEventListener('keydown' , function(e){
-            var str = tags.input.value.trim();
-
-            if( !!(~[9 , 13 , 188].indexOf( e.keyCode ))  )
-            {
-                e.preventDefault();
-                tags.input.value = "";
-                if(str != "")
-                    tags.addTag(str);
-            }
-
-        });
-    }
-
-
-    // Set All the Default Values
-        TagsInput.defaults = {
-            selector : '',
-            wrapperClass : 'tags-input-wrapper',
-            tagClass : 'tag',
-            max : null,
-            duplicate: false
-        }
-
-        window.TagsInput = TagsInput;
-
-    })();
-
-     var tagInput1 = new TagsInput({
-                selector: 'tag-input1',
-                duplicate : false,
-                max : 10
-           });
-     tagInput1.addData(['GMA' , 'škola' ])
 
     </script>
 

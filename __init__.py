@@ -15,9 +15,9 @@ UPLOAD_FOLDER = '/path/files'
 
 app = Flask(__name__)
 
-app.register_blueprint(admin_bp,url_prefix="/admin")
-app.register_blueprint(student_bp,url_prefix="/student")
-app.register_blueprint(book_bp,url_prefix="/book")
+app.register_blueprint(admin_bp, url_prefix="/admin")
+app.register_blueprint(student_bp, url_prefix="/student")
+app.register_blueprint(book_bp, url_prefix="/book")
 
 app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(16)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER

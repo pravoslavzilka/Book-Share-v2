@@ -69,6 +69,7 @@
                           <p>
                               Podržte kurzor nad názvami aby sa zobrazil tooltip
                           </p>
+                          <img src="{{ url_for('static',filename='images/guide_students.png') }}" height="300">
                       </div>
                       <div id="operation1" style="display:none">
                         <form id="excelForm" class="needs-validation" action="{{ url_for('admin_bp.upload_file') }}" method="post" style="margin-top:10px;" enctype="multipart/form-data" novalidate>
@@ -102,7 +103,6 @@
                         <button id="help-button" type="button" onclick="show('operation2')" class="btn mr-auto btn-warning">
                             <img src="{{ url_for('static',filename='images/help_icon.png') }}" height="25">
                         </button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavrieť</button>
                         <button type="submit" form="excelForm" class="btn btn-primary">Načítať</button>
                       </div>
                     </div>

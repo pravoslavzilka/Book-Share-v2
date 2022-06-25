@@ -160,16 +160,6 @@ def finish_registration(code):
         student.email = request.form["student-email"]
         student.set_password(request.form["student-password"])
         student.authorized = True
-        student.bio = request.form["student-bio"]
-        tags = list(request.form["student-tags"].split(","))
-        for tag in tags:
-            s_tag = Tag.query.filter(Tag.name == tag).first()
-            if s_tag:
-                student.tags.append(s_tag)
-            else:
-                n_tag = Tag(tag)
-                db_session.add(n_tag)
-                student.tags.append(n_tag)
 
         db_session.commit()
         flash("Profil vytvorený, môžeš as prihlásiť", "success")

@@ -18,7 +18,7 @@ def check_admin(func):
         if "permit" in session:
             if session["permit"] == 1:
                 return func(*args, **kwargs)
-        return redirect(url_for("admin_bp.login_page"))
+        return redirect(url_for("student_bp.login_page"))
     return inner
 
 
@@ -99,6 +99,21 @@ def add_book_with_type(bt_name):
 @check_admin
 def return_book_view():
     return render_template("book/return_book.html")
+
+
+@book_bp.route("/return-book-s-page/<int:book_code>")
+@check_admin
+def return_book_s_page(book_code):
+    book = Book.query.filter(Book.code == int(book_code)).first()
+    if book:
+        if book.student:
+            student = Student.query.filter(Student.id == book.student.id).first()
+            student.books.remove(book)
+            db_session.commit()
+            flash(f"Kniha s kódom {book.code} bola úspešne vrátená", "success")
+            return redirect(url_for("student_bp.view_student", student_id=student.id))
+
+    return redirect(url_for("student_bp.landing_page"))
 
 
 @book_bp.route("/return/",methods=["POST"])
