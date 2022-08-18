@@ -154,6 +154,9 @@
                     <button id="add-book" class="btn btn-primary utilities-buttons" onclick="moveModal" type="button" data-toggle="collapse" data-target="#new-book" aria-expanded="false" aria-controls="new-book">
 	                   + Pridať učebnicu
 	                </button>
+                    <button id="excel-book" style="margin-left:5px;" onclick="changeDiv('operation1')" class="btn btn-secondary utilities-buttons" type="button" data-toggle="modal" data-target="#excelModal">
+	                   Načítať excel
+	                </button>
 
                </div>
             </div>
@@ -289,10 +292,94 @@
       </div>
     </div>
 
+                <div class="modal fade" id="excelModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                  <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h4 class="modal-title" id="exampleModalLabel">Nastavenia excelu</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+
+                      <div class="modal-body">
+                        <form id="books-excel-config-form" class="needs-validation" action="{{ url_for('book_bp.upload_file') }}" method="post" style="margin-top:10px;" enctype="multipart/form-data" novalidate>
+                          <div class="row">
+                            <div style="padding-top:5px;" class="col">
+                                <label for="numStart" data-tip="tooltip" data-placement="top" title="Riadok kde začínajú dáta s knihami">Prvý Riadok</label>
+                            </div>
+                            <div class="col">
+                              <input id="numStart" type="number" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="2" class="form-control" required>
+                            </div>
+                            <div style="padding-top:5px;" class="col">
+                                <label for="numCode" data-tip="tooltip" data-placement="bottom" title="Stĺpec kde sa nachádza kód knihy">Stĺpec Kódu</label>
+                            </div>
+                            <div class="col">
+                                <input id="numCode" name="book-column-code" type="number" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="2" class="form-control" required>
+                            </div>
+                          </div>
+
+                          <div class="custom-file" style="margin-top:20px;">
+                            <input type="file" name="file" class="custom-file-input" id="customFile" required>
+                            <label class="custom-file-label" for="customFile">Vyber súbor</label>
+                          </div>
+                          <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
+                            Vyber platný súbor
+                          </div>
+                           <input type="hidden" name="book_type_name" value="{{ book_type.name }}" />
+                           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Zavrieť</button>
+                        <button type="submit" form="books-excel-config-form" class="btn btn-primary">Načítať</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+
+
 
 
 
     <script>
+
+
+     function show(param_div_id) {
+          if (param_div_id === 'operation2') {
+            document.getElementById( "help-button" ).setAttribute( "onClick", "show('operation1')" );
+            document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
+
+          } else {
+            document.getElementById( "help-button" ).setAttribute( "onClick", "show('operation2')" );
+            document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
+            $('[data-tip="tooltip"]').tooltip()
+          }
+        }
+     function changeDiv(param_div_id) {
+        document.getElementById('main_place').innerHTML = document.getElementById(param_div_id).innerHTML;
+        $('[data-tip="tooltip"]').tooltip()
+     }
+
+        // script to check input
+	    (function() {
+          'use strict';
+          window.addEventListener('load', function() {
+            // Fetch all the forms we want to apply custom Bootstrap validation styles to
+            var forms = document.getElementsByClassName('needs-validation');
+            // Loop over them and prevent submission
+            var validation = Array.prototype.filter.call(forms, function(form) {
+              form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+              }, false);
+            });
+          }, false);
+        })();
         // script for sending data to "delete a book" modal
         $('#modalForDelete').on('show.bs.modal', function (event) {
           var button = $(event.relatedTarget) // Button that triggered the modal

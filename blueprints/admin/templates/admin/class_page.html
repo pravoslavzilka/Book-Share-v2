@@ -217,7 +217,7 @@
         function download() {
             var a = window.document.createElement('a');
             a.href = window.URL.createObjectURL(new Blob(['{% for student in students %}{{student.name}} : {{ student.code}}\n{% endfor %}'], {type: 'text/csv'}));
-            a.download = 'zoznam_studentov_{{ grade.name }}.csv';
+            a.download = 'Zoznam_Studentov_{{ grade.name }}.csv';
 
             // Append anchor to body.
             document.body.appendChild(a);

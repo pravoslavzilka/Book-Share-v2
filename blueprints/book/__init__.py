@@ -303,49 +303,36 @@ def upload_file():
         flash('No selected file')
         return redirect(request.url)
 
+    book_type_name = request.form["book_type_name"]
+
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         wb_obj = openpyxl.load_workbook(file)
         sheet_obj = wb_obj.active
 
-        try:
-            for i in range(1,sheet_obj.max_row):
-                name = sheet_obj.cell(row=i+1, column=1).value
-                code = sheet_obj.cell(row=i+1, column=3).value
+        book_code_column = int(request.form["book-column-code"])
+        book_type = BookType.query.filter(BookType.name == book_type_name).first()
 
-                book_type = BookType.query.filter(BookType.name == name).first()
-                if book_type:
-                    new_book = Book(code,book_type)
-                    db_session.add(new_book)
-                elif name == ": Geografický atlas pre ZŠ a SŠ":
-                    book_type = BookType.query.filter(BookType.name == "Geografický atlas pre ZŠ a SŠ").first()
-                    if book_type:
-                        new_book = Book(code, book_type)
-                        db_session.add(new_book)
-                    else:
-                        print(name,"FAIL")
+        if book_type:
+            try:
+                for i in range(1, sheet_obj.max_row):
+                    code = sheet_obj.cell(row=i+2, column=book_code_column).value
+                    if code:
+                        try:
+                            new_book = Book(code, book_type)
+                            db_session.add(new_book)
+                        except:
+                            continue
 
-                elif name == "Litetatúra 1 pre  SŠ":
-                    book_type = BookType.query.filter(BookType.name == "Litetatúra 1  pre  SŠ").first()
-                    if book_type:
-                        new_book = Book(code, book_type)
-                        db_session.add(new_book)
-                    else:
-                        print(name, "FAIL")
-                elif name == None:
-                    pass
-                else:
-                    print(name,"FAIL")
+                db_session.commit()
+            except:
+                flash("Nastala chyba pri nahrávaní", "danger")
+                return redirect(url_for("book_bp.book_type_page", bt_name=book_type_name))
 
-            db_session.commit()
-        except:
-            flash("Nastala chyba pri nahrávaní. Ujistite sa, či študenti z tabuľky nie su už v systéme", "danger")
-            return redirect(url_for("book_bp.landing_page"))
-
-        flash("Učebnice z execelu boli úspešne pridané","success")
-        return redirect(url_for("book_bp.landing_page"))
+            flash("Učebnice z execelu boli úspešne pridané","success")
+            return redirect(url_for("book_bp.book_type_page", bt_name=book_type_name))
 
     allow_f_string = ' / '.join(map(str, ALLOWED_EXTENSIONS))
     flash(f"Súbor nie je podporovaný. Typ súboru musí byť: {allow_f_string}","danger")
-    return redirect(url_for("book_bp.landing_page"))
+    return redirect(url_for("book_bp.book_type_page", bt_name=book_type_name))
 
