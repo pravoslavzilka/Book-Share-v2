@@ -132,7 +132,7 @@
 	            	    <form class="form-inline needs-validation" action="{{ url_for('admin_bp.new_student') }}" method="post" style="margin-top:10px;" novalidate>
 	            		  <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="50" name="student-name" type="text" class="form-control mb-2 mr-sm-2" placeholder="Meno Študenta" required>
                             <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
-                              Zadajte kód učebnice
+                              Zadajte kód študenta
                             </div>
                             <input type="hidden" name="student-grade" value="{{ grade.name }}"/>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -146,7 +146,7 @@
 	            	    <form class="form-inline needs-validation" action="{{ url_for('admin_bp.new_student') }}" method="post" style="margin-top:10px;" novalidate>
 	            		  <input oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="50" name="student-name" type="text" class="form-control mb-2 mr-sm-2" placeholder="Meno Študenta" required>
                             <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
-                              Zadajte kód učebnice
+                              Zadajte kód študenta
                             </div>
                             <input type="hidden" name="student-grade" value="{{ grade.name }}"/>
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -162,7 +162,16 @@
 	                   Načítať excel
 	                </button>
 
+
+
+
+
                </div>
+                <div style="margin-top:5px;" class="d-flex justify-content-center">
+                <button style="width:170px;" onclick="download()" class="btn btn-secondary utilities-buttons" type="button">
+	                   Stiahnúť zoznam
+	                </button>
+                </div>
             </div>
             <div id="book-list" class="book-list col-md-8 col-lg-8 col-sm-12 col-xs-12">
                 <div  id="book-list2" style="margin-bottom:10px;">
@@ -204,6 +213,20 @@
 
 
     <script>
+
+        function download() {
+            var a = window.document.createElement('a');
+            a.href = window.URL.createObjectURL(new Blob(['{% for student in students %}{{student.name}} : {{ student.code}}\n{% endfor %}'], {type: 'text/csv'}));
+            a.download = 'zoznam_studentov_{{ grade.name }}.csv';
+
+            // Append anchor to body.
+            document.body.appendChild(a);
+            a.click();
+
+            // Remove anchor from body
+            document.body.removeChild(a);
+        }
+
         function show(param_div_id) {
           if (param_div_id === 'operation2') {
             document.getElementById( "help-button" ).setAttribute( "onClick", "show('operation1')" );
