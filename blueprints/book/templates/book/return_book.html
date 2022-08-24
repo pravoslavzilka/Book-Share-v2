@@ -156,7 +156,7 @@
               <h5 class="card-title text-center">Kód knihy:</h5>
               <form class="form-signin needs-validation" method="post" action="{{url_for('book_bp.return_book')}}" novalidate>
                 <div class="form-label-group">
-                  <input type="number" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="15"  id="inputEmail" name="book_code" class="form-control" placeholder="Enter your student's code" required autofocus>
+                  <input type="number" id="sID" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="15" name="book_code" class="form-control" placeholder="Enter your student's code" required autofocus>
                   <div style="margin-left:10px;" class="invalid-feedback">
                     Zadajte platný kód učebnice
                   </div>
@@ -191,6 +191,15 @@
             });
           }, false);
         })();
+
+        $(function() {
+          var $id = $('#sID');
+          $id.keyup(function(e) {
+            if ($id.val().length >= 7) {
+              $(this.form).submit();
+            }
+          });
+        });
     </script>
 
 {% endblock content %}
