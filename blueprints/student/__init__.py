@@ -1,11 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, request, flash, session
 from database import db_session
-from models import Grade, Student, Book, Tag, User
-from werkzeug.utils import secure_filename
+from models import Grade, Student, Book, User
+from functools import wraps
 from flask_login import login_required, current_user, login_user, logout_user
-import openpyxl
-import random
-import string
 
 
 student_bp = Blueprint("student_bp",__name__,template_folder="templates")
@@ -14,8 +11,18 @@ ALLOWED_EXTENSIONS = {'xlsx','xlsm','xltx','xltm'}
 UPLOAD_FOLDER = '/path/files'
 
 
+def check_admin(func):
+    @wraps(func)
+    def inner(*args, **kwargs):
+        if "permit" in session:
+            if session["permit"] == 1:
+                return func(*args, **kwargs)
+        return redirect(url_for("student_bp.login_page"))
+    return inner
+
+
 @student_bp.route("/view/<int:student_id>/")
-@login_required
+@check_admin
 def view_student(student_id):
     try:
         student = Student.query.filter(Student.id == student_id).first()
@@ -25,7 +32,7 @@ def view_student(student_id):
 
     if student:
         grades = Grade.query.all()
-        return render_template("student/student_page.html",student=student, grades=grades)
+        return render_template("student/student_page.html", student=student, grades=grades)
     flash("Neplatný kód študenta","danger")
     return redirect(url_for("student_bp.search_student"))
 
@@ -38,42 +45,56 @@ def student_account():
     return render_template("student/student_page.html", student=current_user, grades=grades)
 
 
-@student_bp.route("/<int:student_id>/rent_book/",methods=["POST"])
+@student_bp.route("/<int:student_id>/rent_book/", methods=["POST"])
+@login_required
 def rent_book(student_id):
     try:
         book = Book.query.filter(Book.code == int(request.form["code"])).first()
     except OverflowError:
-        flash("Neplatný kód učebnice","danger")
-        return redirect(url_for("student_bp.view_student", student_id=student_id))
+        flash("Neplatný kód učebnice", "danger")
+        return redirect(url_for("student_bp.student_account"))
 
     if book:
         if book.student:
             flash("Učebnica s týmto kódom je už požičaná","danger")
         else:
-            student = Student.query.filter(Student.id == student_id).first()
-            if student:
-                student.books.append(book)
-                db_session.commit()
-                flash("Učebnica bola pridaná", "success")
-            else:
-                return redirect(url_for("student_bp.search_student"))
+            if "permit" in session:
+                if session["permit"] == 1:
+
+                    student = Student.query.filter(Student.id == student_id).first()
+                    if student:
+                        student.books.append(book)
+                        db_session.commit()
+                        flash("Učebnica bola pridaná", "success")
+                        return redirect(url_for("student_bp.view_student", student_id=student_id))
+                    else:
+                        return redirect(url_for("student_bp.search_student"))
+
+            current_user.books.append(book)
+            db_session.commit()
+            flash("Učebnica bola pridaná", "success")
+            return redirect(url_for("student_bp.student_account"))
+
+
     else:
-        flash("Neplatný kód","danger")
-    return redirect(url_for("student_bp.view_student",student_id=student_id))
+        flash("Neplatný kód", "danger")
+    return redirect(url_for("student_bp.student_account"))
 
 
 @student_bp.route("/search_student/")
+@check_admin
 def search_student():
     return render_template("student/search_student.html")
 
 
 @student_bp.route("/search_student/",methods=["POST"])
+@check_admin
 def search_student2():
     student_code = request.form["student_code"]
     if 1 < len(student_code) < 25:
         student = Student.query.filter(Student.code == student_code).first()
         if student:
-            return redirect(url_for("student_bp.view_student",student_id=student.id))
+            return redirect(url_for("student_bp.view_student", student_id=student.id))
 
     flash("Neplatný kód","danger")
     return render_template("student/search_student.html")
@@ -81,6 +102,8 @@ def search_student2():
 
 @student_bp.route("/login/", methods=["GET"])
 def login_page():
+    if current_user.is_authenticated:
+        return redirect(url_for("student_bp.student_account"))
     return render_template("student/login_page.html")
 
 
@@ -154,7 +177,6 @@ def finish_registration(code):
 
         if st_check or ad_check:
             flash("Email sa už používa", "danger")
-            print("sdfsd")
             return render_template("student/login_page.html", register_bool=True)
 
         student.email = request.form["student-email"]
@@ -162,8 +184,9 @@ def finish_registration(code):
         student.authorized = True
 
         db_session.commit()
-        flash("Profil vytvorený, môžeš as prihlásiť", "success")
-        return render_template("student/login_page.html")
+        login_user(student)
+        flash("Tvoj profil bol autorizovaný", "success")
+        return redirect(url_for("student_bp.student_account"))
 
     flash("Neplatný kód", "danger")
     return render_template("student/login_page.html", register_bool=True)
