@@ -182,12 +182,12 @@ def return_book_with_type():
     return redirect(url_for("book_bp.book_type_page",bt_name=book.book_type.name))
 
 
-@book_bp.route("/delete/",methods=['POST'])
+@book_bp.route("/delete/", methods=['POST'])
 @check_admin
 def delete_book():
-    book_code = int(request.form["book_code"])
+    book_id = int(request.form["book_id"])
     try:
-        book = Book.query.filter(Book.code == book_code).first()
+        book = Book.query.filter(Book.id == book_id).first()
     except OverflowError:
         flash("Neplatný kód", "danger")
         return redirect(url_for("book_bp.list_of_books"))
@@ -197,18 +197,19 @@ def delete_book():
         db_session.delete(book)
         db_session.commit()
         flash(f"Kniha s kódom {book.code} bola úspešne odstránená","success")
-        return redirect(url_for("book_bp.book_type_page",bt_name=book_type.name))
+        return redirect(url_for("book_bp.book_type_page", bt_name=book_type.name))
 
     flash("Neplatný kód", "danger")
     return redirect(url_for("book_bp.list_of_books"))
 
 
-@book_bp.route("/delete/from/list/",methods=['POST'])
+@book_bp.route("/delete/from/list/", methods=['POST'])
 @check_admin
 def delete_book_from_list():
-    book_code = int(request.form["book_code"])
+    print(request.form["book_id"])
+    book_id = int(request.form["book_id"])
     try:
-        book = Book.query.filter(Book.code == book_code).first()
+        book = Book.query.filter(Book.id == book_id).first()
     except OverflowError:
         flash("Neplatný kód","danger")
         return redirect(url_for("book_bp.list_of_books"))

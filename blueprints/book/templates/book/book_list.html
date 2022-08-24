@@ -90,7 +90,7 @@
                           <button class="btn btn-sm btn-info" data-toggle="modal" data-target="#modalForReturn" data-bookcode="{{ book.code }}">Vrátiť</button>
                       </td>
                       <td>
-                          <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalForDelete" data-bookcode="{{ book.code }}">Odstrániť</button>
+                          <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalForDelete" data-bookid="{{ book.id }}">Odstrániť</button>
                       </td>
                     </tr>
                 {% else %}
@@ -101,7 +101,7 @@
                       <td>-</td>
                       <td>-</td>
                       <td>
-                          <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalForDelete" data-bookcode="{{ book.code }}">Odstrániť</button>
+                          <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalForDelete" data-bookid="{{ book.id }}"">Odstrániť</button>
                       </td>
                     </tr>
                 {% endif %}
@@ -126,7 +126,7 @@
             </div>
             <form method="post" action="{{ url_for('book_bp.delete_book_from_list') }}">
               <div class="form-group change-input d-none">
-                <input type="number" name="book_code" class="form-control">
+                <input type="number" name="book_id" class="form-control">
               </div>
                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <button type="submit" class="btn btn-danger float-right">Odstrániť</button>
@@ -172,7 +172,7 @@
         // script for sending data to "delete a book" modal
         $('#modalForDelete').on('show.bs.modal', function (event) {
           var button = $(event.relatedTarget) // Button that triggered the modal
-          var recipient = button.data('bookcode') // Extract info from data-* attributes
+          var recipient = button.data('bookid') // Extract info from data-* attributes
 
           var modal = $(this)
           modal.find('.modal-body .main-text').text("Naozaj chcete odstrániť učebnicu s kódom " + recipient)
