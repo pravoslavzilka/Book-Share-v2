@@ -114,7 +114,6 @@
                                 </div>
                             </div>
                           </div>
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                           <div style="padding-top:15px;">
                               <button type="submit" class="btn btn-sm btn-success">Uložiť zmeny</button>
                               <button onclick="show('operation2')" class="btn btn-sm btn-secondary ">Vrátiť</button>
@@ -133,7 +132,6 @@
                             <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
                               Zadajte kód učebnice
                             </div>
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                           <button type="submit" class="btn btn-success mb-2">Pridať</button>
 	            		</form>
 	            	  </div>
@@ -146,7 +144,6 @@
                           <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
                               Zadajte kód učebnice
                           </div>
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                           <button type="submit" class="btn btn-success mb-2">Pridať</button>
 	            		</form>
 	            	  </div>
@@ -255,7 +252,6 @@
               <div class="form-group book-code-div d-none">
                 <input id="book_id" type="number" name="book_id" class="form-control">
               </div>
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <button type="submit" class="btn btn-danger float-right">Odstrániť</button>
               <button type="button" class="btn btn-secondary float-right" style="margin-right:5px;" data-dismiss="modal">Zrušiť</button>
             </form>
@@ -283,7 +279,6 @@
               <div class="form-group book-code-div d-none">
                 <input type="number" name="book_code" class="form-control">
               </div>
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               <button type="submit" class="btn btn-info float-right">Vrátiť</button>
               <button type="button" class="btn btn-secondary float-right" style="margin-right:5px;" data-dismiss="modal">Zrušiť</button>
             </form>
@@ -327,7 +322,6 @@
                             Vyber platný súbor
                           </div>
                            <input type="hidden" name="book_type_name" value="{{ book_type.name }}" />
-                           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         </form>
                       </div>
                       <div class="modal-footer">

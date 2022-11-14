@@ -35,11 +35,39 @@
 
     </style>
 
+    <div class="modal fade bd-example-modal-sm" id="options" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered modal-sm" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title">Možnosti</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+
+                 <button class="btn btn-success" type="button"  data-toggle="modal" data-target="#ar_u_s">
+		        Zdvihnúť všetkých študentov
+		      </button>
+              <button class="btn btn-secondary" type="button" style="margin-top:10px;" data-toggle="modal" data-target="#ar_u_s_2">
+		        Znížiť všetkých študentov
+		      </button>
+
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Zrušiť</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
     <div class="container" style="margin-top:70px;">
         <div class="row d-flex justify-content-center">
             <h1>Študenti</h1>
         </div>
     </div>
+
 
     <div class="container" style="margin-top:30px;">
         <div class="row d-flex justify-content-center">
@@ -94,18 +122,19 @@
 
             <div class="d-flex justify-content-center" style="margin-top:20px;">
 
-		      <button class="btn btn-success" type="button"  data-toggle="modal" data-target="#ar_u_s">
-		        Zdvihnúť všetkých študentov
-		      </button>
-              <button class="btn btn-secondary" type="button" style="margin-left:10px;" data-toggle="modal" data-target="#ar_u_s_2">
-		        Znížiť všetkých študentov
-		      </button>
+
 		    </div>
 
 
 
 
-    <div class="container" style="padding-top:60px;">
+    <div class="container" style="padding-top:10px;">
+        <a style="margin-bottom:10px;margin-right:5px;" href="{{ url_for('admin_bp.landing_page') }}" class="btn btn-secondary utilities-buttons" aria-controls="new-book">
+            Späť k triedam
+        </a>
+        <button id="add-sbook" style="margin-bottom:10px;" class="btn btn-primary utilities-buttons" type="button" data-toggle="modal" data-target="#options" aria-expanded="false" aria-controls="new-book">
+            Možnosti
+        </button>
         <table class="table" id="students-table">
           <thead class="thead-dark">
             <tr class="header">
@@ -121,7 +150,7 @@
           <tbody>
             {% for student in students %}
                 <tr>
-                  <th scope="row">{{ student.id }}</th>
+                  <th scope="row">{{ loop.index }}</th>
                   <td>{{ student.name }}</td>
                   <td>{{ student.code }}</td>
                   <td>{{ student.grade.name }}</td>

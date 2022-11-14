@@ -337,3 +337,56 @@ def upload_file():
     flash(f"Súbor nie je podporovaný. Typ súboru musí byť: {allow_f_string}","danger")
     return redirect(url_for("book_bp.book_type_page", bt_name=book_type_name))
 
+
+@book_bp.route('/upload/source/excel/full/',methods=["POST"])
+@check_admin
+def upload_file_full():
+
+    file = request.files['file']
+    if file.filename == '':
+        flash('No selected file')
+        return redirect(request.url)
+
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        wb_obj = openpyxl.load_workbook(file)
+        sheet_obj = wb_obj.active
+
+        book_code_column = int(request.form["book-column-code"])
+        book_author_column = int(request.form["book-column-author"])
+        book_name_column = int(request.form["book-column-name"])
+
+        for i in range(1, sheet_obj.max_row):
+            book_type_name = sheet_obj.cell(row=i+2, column=book_name_column).value
+            book_type = BookType.query.filter(BookType.name == book_type_name).first()
+
+            code = sheet_obj.cell(row=i + 2, column=book_code_column).value
+
+            if book_type:
+                if code:
+                    new_book = Book(code, book_type)
+                    db_session.add(new_book)
+                    db_session.commit()
+                    print(f"-{code}-")
+
+            else:
+                book_type_author = sheet_obj.cell(row=i+2, column=book_author_column).value
+                new_book_type = BookType(book_type_name, book_type_author)
+
+                db_session.add(new_book_type)
+                db_session.commit()
+                print(f"vytvorená nová kniha: Meno: {new_book_type.name} Autor: {new_book_type.author}")
+                if code:
+                    new_book = Book(code, new_book_type)
+                    db_session.add(new_book)
+                    db_session.commit()
+                    print(f"-{code}-")
+
+        db_session.commit()
+        flash("Knihy boli pridané", "success")
+        return redirect(url_for("book_bp.landing_page"))
+
+    allow_f_string = ' / '.join(map(str, ALLOWED_EXTENSIONS))
+    flash(f"Súbor nie je podporovaný. Typ súboru musí byť: {allow_f_string}","danger")
+    return redirect(url_for("book_bp.landing_page"))
+

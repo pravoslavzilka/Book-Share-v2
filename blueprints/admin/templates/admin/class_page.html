@@ -96,7 +96,6 @@
                             Vyber platný súbor
                           </div>
                            <input type="hidden" name="grade" value="{{ grade.name }}"/>
-                           <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         </form>
                       </div>
                       <div class="modal-footer">
@@ -135,7 +134,6 @@
                               Zadajte kód študenta
                             </div>
                             <input type="hidden" name="student-grade" value="{{ grade.name }}"/>
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                           <button type="submit" class="btn btn-success mb-2">Pridať</button>
 	            		</form>
 	            	  </div>
@@ -149,7 +147,6 @@
                               Zadajte kód študenta
                             </div>
                             <input type="hidden" name="student-grade" value="{{ grade.name }}"/>
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                           <button type="submit" class="btn btn-success mb-2">Pridať</button>
 	            		</form>
 	            	  </div>
@@ -192,7 +189,7 @@
                   <tbody>
                     {% for student in students %}
                         <tr>
-                          <th scope="row">{{ student.id }}</th>
+                          <th scope="row">{{ loop.index }}</th>
                           <td>{{ student.name }}</td>
                           <td>{{ student.code }}</td>
                           <td>{{ student.authorized }}</td>

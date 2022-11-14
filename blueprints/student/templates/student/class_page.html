@@ -117,7 +117,7 @@
                   <tbody>
                     {% for student in students %}
                         <tr>
-                          <th scope="row">{{ student.id }}</th>
+                          <th scope="row">{{ loop.index }}</th>
                           <td>{{ student.name }}</td>
                           <td>{{ student.code }}</td>
                           <td>{{ grade.name }}</td>

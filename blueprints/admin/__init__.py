@@ -177,7 +177,7 @@ def return_all(student_id):
     db_session.commit()
     flash(f"Všetky učebnice žiaka {student.name} boli úspešne vrátené","success")
 
-    return redirect(url_for("admin_bp.view_student",student_id=student_id))
+    return redirect(url_for("student_bp.view_student",student_id=student_id))
 
 
 @admin_bp.route("/delete/<int:student_id>/")

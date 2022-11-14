@@ -32,7 +32,7 @@ def view_student(student_id):
 
     if student:
         grades = Grade.query.all()
-        return render_template("student/student_page.html", student=student, grades=grades)
+        return render_template("student/student_view.html", student=student, grades=grades)
     flash("Neplatný kód študenta","danger")
     return redirect(url_for("student_bp.search_student"))
 

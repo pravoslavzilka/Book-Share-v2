@@ -6,8 +6,6 @@ from database import db_session
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from models import User, Student
-from flask_migrate import Migrate
-from flask_sqlalchemy import SQLAlchemy
 import os
 
 
@@ -27,7 +25,6 @@ app.config["SESSION_COOKIE_SECURE"] = True
 app.config["REMEMBER_COOKIE_SECURE"] = True
 app.config["SESSION_COOKIE_SAMESITE"] = 'Lax'
 
-csrf = CSRFProtect(app)
 UsersStatus = []
 
 app.jinja_env.autoescape = True | False
@@ -36,7 +33,7 @@ app.jinja_env.autoescape = True | False
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "student_bp.login_page"
-login_manager.login_message = "Please sign in to access this page"
+login_manager.login_message = "Prihlás sa do aplikácie"
 login_manager.login_message_category = "info"
 login_manager.session_protection = "strong"
 
@@ -48,6 +45,11 @@ login_manager.session_protection = "strong"
 @app.route("/")
 def welcome_page():
     return redirect(url_for("student_bp.login_page"))
+
+
+@app.errorhandler(400)
+def error_400(error):
+    return render_template("400.html")
 
 
 @app.errorhandler(404)

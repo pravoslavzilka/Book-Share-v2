@@ -236,7 +236,7 @@
                           <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
                             Zadaj platný kód učebnice
                           </div>
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
                           <button type="submit" class="btn btn-success mb-2">Pridať</button>
 	            		</form>
 	            	  </div>
@@ -249,8 +249,8 @@
                           <div style="margin-top:-5px;margin-bottom:10px;" class="invalid-feedback">
                             Zadaj platný kód učebnice
                           </div>
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+
+
                           <button type="submit" class="btn btn-success mb-2">Pridať</button>
 	            		</form>
 	            	  </div>
@@ -304,27 +304,29 @@
         <div class="d-flex justify-content-center" style="margin-top:130px;">
             <button type="button" class="btn btn-danger btn-lg" data-toggle="modal" data-target="#modalForDelete">Vymazať študenta</button>
         </div>
-    {% endif %}
 
-    <div class="modal fade" id="modalForDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="exampleModalLabel">Vymazanie študenta</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <div class="main-text" style="padding-bottom:20px;">
-                Naozaj chcete vymazať študenta ?
+
+        <div class="modal fade" id="modalForDelete" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Vymazanie študenta</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="main-text" style="padding-bottom:20px;">
+                    Naozaj chcete vymazať študenta ?
+                </div>
+                  <a href="{{ url_for('admin_bp.delete_student', student_id=student.id) }}" class="btn btn-danger float-right">Vymazať</a>
+                  <button type="button" class="btn btn-secondary float-right" style="margin-right:5px;" data-dismiss="modal">Zrušiť</button>
+              </div>
             </div>
-              <a href="{{ url_for('admin_bp.delete_student', student_id=student.id) }}" class="btn btn-danger float-right">Vymazať</a>
-              <button type="button" class="btn btn-secondary float-right" style="margin-right:5px;" data-dismiss="modal">Zrušiť</button>
           </div>
         </div>
-      </div>
-    </div>
+
+    {% endif %}
 
 
 
