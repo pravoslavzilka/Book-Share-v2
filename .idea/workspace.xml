@@ -2,36 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="f36f1681-c023-4426-8fea-645f8b837824" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/Book-Share – v2.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/admin/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/admin/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/admin/templates/admin/class_page.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/admin/templates/admin/class_page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/admin/templates/admin/landing_page.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/admin/templates/admin/landing_page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/admin/templates/admin/login_page.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/admin/templates/admin/login_page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/admin/templates/admin/student_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/admin/templates/admin/student_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/book/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/book/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/book/templates/book/book_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/book/templates/book/book_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/book/templates/book/book_type_page.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/book/templates/book/book_type_page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/book/templates/book/landing_page.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/book/templates/book/landing_page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/book/templates/book/return_book.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/book/templates/book/return_book.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/blueprints/student/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/student/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/student/templates/student/class_page.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/student/templates/student/class_page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/student/templates/student/continue_login.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/student/templates/student/continue_login.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/student/templates/student/landing_page.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/student/templates/student/landing_page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/student/templates/student/login_page.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/student/templates/student/login_page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/student/templates/student/search_student.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/student/templates/student/search_student.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/student/templates/student/student_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/student/templates/student/student_list.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/student/templates/student/student_page.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/student/templates/student/student_page.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/blueprints/student/templates/student/student_view.html" beforeDir="false" afterPath="$PROJECT_DIR$/blueprints/student/templates/student/student_view.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/kniznica@10.1.0.30" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/README" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/alembic.ini" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/env.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/script.py.mako" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/migrations/versions/45bb0b59e377_initial_migration.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/404.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/404.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

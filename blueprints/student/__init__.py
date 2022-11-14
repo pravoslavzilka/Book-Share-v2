@@ -5,6 +5,7 @@ from functools import wraps
 from flask_login import login_required, current_user, login_user, logout_user
 
 
+
 student_bp = Blueprint("student_bp",__name__,template_folder="templates")
 
 ALLOWED_EXTENSIONS = {'xlsx','xlsm','xltx','xltm'}
@@ -190,4 +191,5 @@ def finish_registration(code):
 
     flash("Neplatný kód", "danger")
     return render_template("student/login_page.html", register_bool=True)
+
 

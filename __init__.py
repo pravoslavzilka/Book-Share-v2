@@ -3,8 +3,10 @@ from blueprints.admin.__init__ import admin_bp
 from blueprints.student.__init__ import student_bp
 from blueprints.book.__init__ import book_bp
 from database import db_session
+from flask_mail import Mail, Message
 from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
+from threading import Thread
 from models import User, Student
 import os
 
@@ -42,6 +44,18 @@ login_manager.session_protection = "strong"
 # migrate = Migrate(app, db)
 
 
+
+app.config["MAIL_SERVER"] = 'smtp.gma.sk'
+app.config["MAIL_PORT"] = '587'
+app.config["MAIL_USERNAME"] = 'no-reply@gma.sk'
+app.config["MAIL_PASSWORD"] = 'y@RmeC95'
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USE_SSL'] = False
+app.config['MAIL_DEFAULT_SENDER '] = "no-reply@gma.sk"
+
+mail = Mail(app)
+
+
 @app.route("/")
 def welcome_page():
     return redirect(url_for("student_bp.login_page"))
@@ -70,6 +84,23 @@ def shutdown_session(exception=None):
 @login_manager.user_loader
 def load_user(user_id):
     return Student.query.filter(Student.id == user_id).first() or User.query.filter(User.id == user_id).first()
+
+
+@app.route("/send-email")
+def send_email_page():
+    msg = Message(sender=app.config['MAIL_DEFAULT_SENDER '])
+    msg.subject = "Reset password"
+    msg.recipients = ["pravoslav.zilka@gmail.com"]
+    msg.body = "hello"
+    Thread(target=send_email, args=(app, msg)).start()
+
+    print("MAIL SENT")
+    return redirect(url_for("welcome_page"))
+
+
+def send_email(app, msg):
+    with app.app_context():
+        mail.send(msg)
 
 
 if __name__ == "__main__":
