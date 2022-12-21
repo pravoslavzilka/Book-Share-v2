@@ -3,10 +3,10 @@ from database import db_session
 from models import Grade, Student, Book, User
 from functools import wraps
 from flask_login import login_required, current_user, login_user, logout_user
+from itsdangerous import URLSafeTimedSerializer
 
 
-
-student_bp = Blueprint("student_bp",__name__,template_folder="templates")
+student_bp = Blueprint("student_bp", __name__, template_folder="templates")
 
 ALLOWED_EXTENSIONS = {'xlsx','xlsm','xltx','xltm'}
 UPLOAD_FOLDER = '/path/files'
@@ -193,3 +193,23 @@ def finish_registration(code):
     return render_template("student/login_page.html", register_bool=True)
 
 
+@student_bp.route("/reset-password/", methods=["POST"])
+def reset_password():
+    email = request.form["email"]
+    password = request.form["password"]
+
+    student = Student.query.filter(Student.email == email).first()
+    if student:
+        student.set_password(password)
+        db_session.commit()
+        flash("Heslo úspešne obnovené", "success")
+        return redirect(url_for("student_bp.login_page"))
+
+    admin = User.query.filter(User.email == email).first()
+    if admin:
+        admin.set_password(password)
+        db_session.commit()
+        flash("Heslo úspešne obnovené", "success")
+        return redirect(url_for("student_bp.login_page"))
+
+    return redirect(url_for("student_bp.login_page"))

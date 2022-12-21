@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for
+from flask import Flask, render_template, redirect, url_for, flash, request
 from blueprints.admin.__init__ import admin_bp
 from blueprints.student.__init__ import student_bp
 from blueprints.book.__init__ import book_bp
@@ -8,6 +8,7 @@ from flask_login import LoginManager
 from flask_wtf.csrf import CSRFProtect
 from threading import Thread
 from models import User, Student
+from itsdangerous import URLSafeTimedSerializer
 import os
 
 
@@ -42,7 +43,6 @@ login_manager.session_protection = "strong"
 # app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 # db = SQLAlchemy(app)
 # migrate = Migrate(app, db)
-
 
 
 app.config["MAIL_SERVER"] = 'smtp.gma.sk'
@@ -86,21 +86,82 @@ def load_user(user_id):
     return Student.query.filter(Student.id == user_id).first() or User.query.filter(User.id == user_id).first()
 
 
-@app.route("/send-email")
-def send_email_page():
+@app.route("/lost-password/", methods=['GET'])
+def lost_password_view():
+    return render_template("student/lost_password.html")
+
+
+@app.route("/lost-password/", methods=['POST'])
+def lost_password_fun():
+    email = request.form["email"]
+
+    student = Student.query.filter(Student.email == email).first()
+    if student:
+        send_email_page(email)
+        return render_template("student/lost_password_info.html")
+
+    admin = User.query.filter(User.email == email).first()
+    if admin:
+        send_email_page(email)
+        return render_template("student/lost_password_info.html")
+
+    flash("Nenašli sme používateľa s týmto emailom.","danger")
+    return render_template("student/lost_password.html")
+
+
+def send_email_page(email):
     msg = Message(sender=app.config['MAIL_DEFAULT_SENDER '])
-    msg.subject = "Reset password"
-    msg.recipients = ["pravoslav.zilka@gmail.com"]
-    msg.body = "hello"
+    msg.subject = "eSklad - Obnova hesla"
+    msg.recipients = [email]
+    msg.body = "Dobrý deň, \nNa následujúcom linku sa Vám otvorí stránka kde si budete môcť resetovať vaše heslo: http://localhost:5000" + generate_reset_link(email)
     Thread(target=send_email, args=(app, msg)).start()
 
-    print("MAIL SENT")
-    return redirect(url_for("welcome_page"))
+
+def generate_reset_link(email):
+    password_reset_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+    password_reset_url = url_for('check_token_request',
+                                 token=password_reset_serializer.dumps(email, salt='password-reset-salt'),
+                                 external=True)
+    return password_reset_url
 
 
 def send_email(app, msg):
     with app.app_context():
         mail.send(msg)
+
+
+@app.route("/reset-password/<token>/", methods=['GET'])
+def check_token_request(token):
+    try:
+        password_reset_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+        email = password_reset_serializer.loads(token, salt='password-reset-salt', max_age=3600)
+    except:
+        flash("Link na obnovu hesla je nesprávný alebo mu vypršala platnosť, skúste to znova neskôr", "danger")
+        return redirect(url_for("student_bp.login_page"))
+
+    flash("Teraz si môžete resetovať heslo", "success")
+    return render_template("student/reset_password.html", email=email)
+
+@student_bp.route("/reset-password/", methods=["POST"])
+def reset_password():
+    email = request.form["email"]
+    password = request.form["password"]
+
+    student = Student.query.filter(Student.email == email).first()
+    if student:
+        student.set_password(password)
+        db_session.commit()
+        flash("Heslo úspešne obnovené", "success")
+        return redirect(url_for("student_bp.login_page"))
+
+    admin = User.query.filter(User.email == email).first()
+    if admin:
+        admin.set_password(password)
+        db_session.commit()
+        flash("Heslo úspešne obnovené", "success")
+        return redirect(url_for("student_bp.login_page"))
+
+    return redirect(url_for("student_bp.login_page"))
 
 
 if __name__ == "__main__":
