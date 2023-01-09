@@ -113,7 +113,7 @@ def send_email_page(email):
     msg = Message(sender=app.config['MAIL_DEFAULT_SENDER '])
     msg.subject = "eSklad - Obnova hesla"
     msg.recipients = [email]
-    msg.body = "Dobrý deň, \nNa následujúcom linku sa Vám otvorí stránka kde si budete môcť resetovať vaše heslo: http://localhost:5000" + generate_reset_link(email)
+    msg.body = "Dobrý deň, \n\nNa následujúcom linku sa Vám otvorí stránka kde si budete môcť resetovať vaše heslo: https://esklad.gma.sk" + generate_reset_link(email) + "\n\nV prípade že ste nežiadali zmenu hesla, prosím ignorujte tento email.\n\nAk by ste mali problémy so svojím účtom, prosím kontaktujte nás na help@gma.sk \n\nS pozdravom, \nTím eSklad "
     Thread(target=send_email, args=(app, msg)).start()
 
 
