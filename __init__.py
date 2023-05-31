@@ -5,7 +5,6 @@ from blueprints.book.__init__ import book_bp
 from database import db_session
 from flask_mail import Mail, Message
 from flask_login import LoginManager
-from flask_wtf.csrf import CSRFProtect
 from threading import Thread
 from models import User, Student
 from itsdangerous import URLSafeTimedSerializer
@@ -20,7 +19,7 @@ app.register_blueprint(admin_bp, url_prefix="/admin")
 app.register_blueprint(student_bp, url_prefix="/student")
 app.register_blueprint(book_bp, url_prefix="/book")
 
-app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(16)
+app.secret_key = b'\x84I\xaf\xed(\x7f\x05\x18&I\xc2\xac<_\x9a\x02'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["REMEMBER_COOKIE_HTTPONLY"] = True
