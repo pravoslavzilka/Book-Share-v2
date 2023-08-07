@@ -197,7 +197,7 @@
                               <td>-</td>
                               <td>-</td>
                               <td>
-                                  <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalForDelete" data-bookid="{{ book.id }}">Odstrániť</button>
+                                  <button class="btn btn-sm btn-danger" data-toggle="modal" data-target="#modalForDelete" data-bookid="{{ book.id }}" data-bookcode="{{ book.code }}" >Odstrániť</button>
                               </td>
                             </tr>
                         {% endif %}
@@ -381,7 +381,7 @@
           var recipient = button.data('bookid') // Extract info from data-* attributes
 
           var modal = $(this)
-          modal.find('.modal-body .main-text').text("Naozaj chcete odstrániť učebnicu s kódom " + recipient)
+          modal.find('.modal-body .main-text').text("Naozaj chcete odstrániť učebnicu s kódom " + button.data('bookcode'))
           modal.find('.modal-body .book-code-div input').val(recipient)
         })
 
