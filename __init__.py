@@ -141,6 +141,7 @@ def check_token_request(token):
     flash("Teraz si môžete resetovať heslo", "success")
     return render_template("student/reset_password.html", email=email)
 
+
 @student_bp.route("/reset-password/", methods=["POST"])
 def reset_password():
     email = request.form["email"]
@@ -161,6 +162,20 @@ def reset_password():
         return redirect(url_for("student_bp.login_page"))
 
     return redirect(url_for("student_bp.login_page"))
+
+
+@app.route("/email-set/")
+def reset_password():
+    emails =["asfdasd"]
+
+    for email in emails:
+        msg = Message(sender=app.config['MAIL_DEFAULT_SENDER '])
+        msg.subject = "eSklad - Oprava Emailu"
+        msg.recipients = [email]
+        msg.body = f"Dobrý deň, \n\nVáš email na stránke https://esklad.gma.sk/ bol opravený. Prosím používajte email: {email} na prihlásenie sa. " + "\n\nAk by ste mali problémy so svojím účtom, prosím kontaktujte nás na help@gma.sk \n\nS pozdravom, \nTím eSklad "
+        Thread(target=send_email, args=(app, msg)).start()
+
+    return '00'
 
 
 if __name__ == "__main__":

@@ -205,7 +205,7 @@
                 <h5 class="card-title text-center">{{ student.name }}</h5>
                 <form class="form-signin needs-validation" method="post" action="{{url_for('student_bp.finish_registration', code=student.code)}}" novalidate>
                   <div class="form-label-group">
-                    <input type="email" id="inputEmail" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="25" name="student-email" class="form-control" placeholder="Email address" required autofocus>
+                    <input type="email" id="inputEmail" oninput="this.value=this.value.slice(0,this.maxLength)" maxlength="50" name="student-email" class="form-control" placeholder="Email address" required autofocus>
                     <div style="margin-left:10px;" class="invalid-feedback">
                       Zadaj platný email
                     </div>
