@@ -19,7 +19,7 @@ app.register_blueprint(admin_bp, url_prefix="/admin")
 app.register_blueprint(student_bp, url_prefix="/student")
 app.register_blueprint(book_bp, url_prefix="/book")
 
-app.secret_key = b'\x84I\xaf\xed(\x7f\x05\x18&I\xc2\xac<_\x9a\x02'
+app.secret_key = os.environ['secretKey']
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["REMEMBER_COOKIE_HTTPONLY"] = True
