@@ -47,7 +47,6 @@ login_manager.session_protection = "strong"
 app.config["MAIL_SERVER"] = 'smtp.gma.sk'
 app.config["MAIL_PORT"] = '587'
 app.config["MAIL_USERNAME"] = 'no-reply@gma.sk'
-app.config["MAIL_PASSWORD"] = 'y@RmeC95'
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USE_SSL'] = False
 app.config['MAIL_DEFAULT_SENDER '] = "no-reply@gma.sk"
